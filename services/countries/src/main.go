@@ -13,7 +13,7 @@ func main() {
 	conf := config.GetInstance()
 
 	router := mux.NewRouter()
-	fmt.Printf("\nHello, serving on :%v", conf.Http.Port)
+	fmt.Printf("\nHello, serving Country REST API on port :%v", conf.Http.Port)
 	router.HandleFunc("/countries", dao.GetCountries).Methods("GET")
 	router.HandleFunc("/countries/{id}", dao.GetCountry).Methods("GET")
 	router.HandleFunc("/countries/{id}", dao.CreateCountry).Methods("POST")

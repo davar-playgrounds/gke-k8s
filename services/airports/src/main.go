@@ -13,10 +13,10 @@ func main() {
 	conf := config.GetInstance()
 
 	router := mux.NewRouter()
-	fmt.Printf("\nHello, serving on :%v", conf.Http.Port)
-	router.HandleFunc("/airports", dao.GetCountries).Methods("GET")
-	router.HandleFunc("/airports/{id}", dao.GetCountry).Methods("GET")
-	router.HandleFunc("/airports/{id}", dao.CreateCountry).Methods("POST")
-	router.HandleFunc("/airports/{id}", dao.DeleteCountry).Methods("DELETE")
+	fmt.Printf("\nHello, serving Airport REST API on port :%v", conf.Http.Port)
+	router.HandleFunc("/airports", dao.GetAirports).Methods("GET")
+	router.HandleFunc("/airports/{id}", dao.GetAirport).Methods("GET")
+	router.HandleFunc("/airports/{id}", dao.CreateAirport).Methods("POST")
+	router.HandleFunc("/airports/{id}", dao.DeleteAirport).Methods("DELETE")
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", conf.Http.Port), router))
 }
