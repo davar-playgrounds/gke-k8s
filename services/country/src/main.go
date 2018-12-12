@@ -1,8 +1,8 @@
 package main
 
 import (
-	"./config"
-	"./models"
+	"github.com/mhaddon/gke-k8s/services/common/src/config"
+	"github.com/mhaddon/gke-k8s/services/common/src/models"
 	"fmt"
 	"github.com/gorilla/mux"
 	"log"

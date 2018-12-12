@@ -1,7 +1,7 @@
 package persistence
 
 import (
-	"../config"
+	"github.com/mhaddon/gke-k8s/services/common/src/config"
 	"fmt"
 	"gopkg.in/mgo.v2"
 	"log"
