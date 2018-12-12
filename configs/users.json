@@ -1,0 +1,10 @@
+[
+  {
+    "name": "michael",
+    "admin": true
+  },
+  {
+    "name": "daniel",
+    "admin": false
+  }
+]

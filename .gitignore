@@ -1,0 +1,6 @@
+*.tar.gz
+secrets
+data/json
+docker/jenkins
+compose.yaml
+services/country/bin

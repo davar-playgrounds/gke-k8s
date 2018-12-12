@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+
+kubectl config set-cluster k8-workshop --embed-certs=true --server="${ENDPOINT}" --certificate-authority=./ca.crt
+
+kubectl config set-credentials ${USERNAME} --token="${TOKEN}"
+
+kubectl config set-context ${USERNAME}-k8-workshop --cluster=k8-workshop --user=${USERNAME} --namespace=${USERNAME}
+
+kubectl config use-context ${USERNAME}-k8-workshop
+
+kubectl proxy --port 8081 --address='0.0.0.0' --accept-hosts='.*' &
+
+sleep 1
+
+sh
