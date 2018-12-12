@@ -32,9 +32,9 @@ func serveJS(w http.ResponseWriter, r *http.Request) {
 
 func routeTraffic(router *mux.Router, host string, endpoint string) {
 	router.HandleFunc(endpoint, func(w http.ResponseWriter, r *http.Request) {
-		url := fmt.Sprintf("%s/%s", host, r.RequestURI)
+		url := fmt.Sprintf("%s%s", host, r.RequestURI)
 
-		fmt.Printf("Url: %s", url)
+		fmt.Printf("\nUrl: %s\n", url)
 
 		timeout := time.Duration(5) * time.Second
 		transport := &http.Transport{
@@ -51,17 +51,16 @@ func routeTraffic(router *mux.Router, host string, endpoint string) {
 		resp, err := client.Get(url)
 		if err != nil {
 			helper.PrintErrorMessage(w, 500, "Routing error; service down")
-			log.Fatal(err)
+			log.Panic(err)
 		}
 
 		defer resp.Body.Close()
 
 		w.Header().Set("Content-Type", r.Header.Get("Content-Type"))
-		w.Header().Set("Content-Length", r.Header.Get("Content-Length"))
 
 		if _, err := io.Copy(w, resp.Body); err != nil {
 			helper.PrintErrorMessage(w, 500, "Error creating response")
-			log.Fatal(err)
+			log.Panic(err)
 		}
 
 	}).Methods("GET")
@@ -76,9 +75,10 @@ func main() {
 	router.HandleFunc("/app.js", serveJS).Methods("GET")
 	router.HandleFunc("/app.css", serveCSS).Methods("GET")
 
+	routeTraffic(router, conf.Services.Countries, "/countries")
 	routeTraffic(router, conf.Services.Countries, "/countries/{id}")
 
 
 
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", conf.Http.Port), router))
+	log.Panic(http.ListenAndServe(fmt.Sprintf(":%v", conf.Http.Port), router))
 }

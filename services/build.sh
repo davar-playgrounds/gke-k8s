@@ -2,7 +2,9 @@
 
 set -x
 
-./airports/build.sh
-./countries/build.sh
-./runways/build.sh
-./frontend/build.sh
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+${DIR}/airports/build.sh
+${DIR}/countries/build.sh
+${DIR}/runways/build.sh
+${DIR}/frontend/build.sh

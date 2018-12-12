@@ -18,5 +18,5 @@ func main() {
 	router.HandleFunc("/airports/{id}", dao.GetAirport).Methods("GET")
 	router.HandleFunc("/airports/{id}", dao.CreateAirport).Methods("POST")
 	router.HandleFunc("/airports/{id}", dao.DeleteAirport).Methods("DELETE")
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", conf.Http.Port), router))
+	log.Panic(http.ListenAndServe(fmt.Sprintf(":%v", conf.Http.Port), router))
 }

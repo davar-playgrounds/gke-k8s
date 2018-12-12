@@ -18,5 +18,5 @@ func main() {
 	router.HandleFunc("/countries/{id}", dao.GetCountry).Methods("GET")
 	router.HandleFunc("/countries/{id}", dao.CreateCountry).Methods("POST")
 	router.HandleFunc("/countries/{id}", dao.DeleteCountry).Methods("DELETE")
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", conf.Http.Port), router))
+	log.Panic(http.ListenAndServe(fmt.Sprintf(":%v", conf.Http.Port), router))
 }

@@ -58,7 +58,7 @@ func createMongoConfig() *mongo {
 		err := gonfig.GetConf(path, &mongo)
 
 		if err != nil {
-			log.Fatal(err)
+			log.Panic(err)
 		}
 	}
 
@@ -74,7 +74,7 @@ func createHTTPConfig() *http {
 		err := gonfig.GetConf(path, &http)
 
 		if err != nil {
-			log.Fatal(err)
+			log.Panic(err)
 		}
 	}
 
@@ -90,7 +90,7 @@ func createServicesConfig() *services {
 		err := gonfig.GetConf(path, &services)
 
 		if err != nil {
-			log.Fatal(err)
+			log.Panic(err)
 		}
 	}
 
