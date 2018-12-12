@@ -1,8 +1,9 @@
 package dao
 
 import (
-	"../persistence"
-	"../helper"
+	"github.com/mhaddon/gke-k8s/services/common/src/persistence"
+	"github.com/mhaddon/gke-k8s/services/common/src/helper"
+	"github.com/mhaddon/gke-k8s/services/common/src/models"
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2/bson"
@@ -12,7 +13,7 @@ import (
 )
 
 func GetCountries(w http.ResponseWriter, r *http.Request) {
-	result := make([]Country, 0, 10)
+	result := make([]models.Country, 0, 10)
 
 	if err := persistence.GetCollection().Find(nil).All(&result); err != nil {
 		helper.PrintErrorMessage(w, 500, "Could not process request")
@@ -32,7 +33,7 @@ func GetCountries(w http.ResponseWriter, r *http.Request) {
 func GetCountry(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
-	result := Country{}
+	result := models.Country{}
 
 	i, err := strconv.ParseInt(params["id"], 10, 0)
 
@@ -58,7 +59,7 @@ func GetCountry(w http.ResponseWriter, r *http.Request) {
 
 func CreateCountry(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	country := Country{}
+	country := models.Country{}
 
 	i, err := strconv.ParseInt(params["id"], 10, 0)
 

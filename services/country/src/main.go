@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/mhaddon/gke-k8s/services/common/src/config"
-	"github.com/mhaddon/gke-k8s/services/common/src/models"
+	"./dao"
 	"fmt"
 	"github.com/gorilla/mux"
 	"log"
@@ -14,9 +14,9 @@ func main() {
 
 	router := mux.NewRouter()
 	fmt.Printf("\nHello, serving on :%v", conf.Http.Port)
-	router.HandleFunc("/country", models.GetCountries).Methods("GET")
-	router.HandleFunc("/country/{id}", models.GetCountry).Methods("GET")
-	router.HandleFunc("/country/{id}", models.CreateCountry).Methods("POST")
-	router.HandleFunc("/country/{id}", models.DeleteCountry).Methods("DELETE")
+	router.HandleFunc("/country", dao.GetCountries).Methods("GET")
+	router.HandleFunc("/country/{id}", dao.GetCountry).Methods("GET")
+	router.HandleFunc("/country/{id}", dao.CreateCountry).Methods("POST")
+	router.HandleFunc("/country/{id}", dao.DeleteCountry).Methods("DELETE")
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%v", conf.Http.Port), router))
 }
