@@ -2,12 +2,14 @@ package config
 
 import (
 	"github.com/tkanos/gonfig"
+	"os"
 	"sync"
 )
 
 type configuration struct {
-	Mongo *mongo
-	Http  *http
+	Mongo    *mongo
+	Http     *http
+	Services *services
 }
 
 type mongo struct {
@@ -23,37 +25,56 @@ type http struct {
 	Port int `env:"HTTP_PORT"`
 }
 
+type services struct {
+	Airports  int `env:"SERVICE_AIRPORTS"`
+	Countries int `env:"SERVICE_COUNTRIES"`
+	Runways   int `env:"SERVICE_RUNWAYS"`
+}
+
 var instance *configuration
 var once sync.Once
 
 func GetInstance() *configuration {
 	once.Do(func() {
 		instance = &configuration{
-			Mongo: createMongoConfig(),
-			Http:  createHTTPConfig(),
+			Mongo:    createMongoConfig(),
+			Http:     createHTTPConfig(),
+			Services: createServicesConfig(),
 		}
 	})
 	return instance
 }
 
+func loadConfiguration(path string, configuration interface{}) {
+	if _, err := os.Stat(path); !os.IsNotExist(err) {
+		err := gonfig.GetConf(path, &configuration)
+
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
 func createMongoConfig() *mongo {
 	mongo := mongo{}
-	err := gonfig.GetConf("resources/persistence.json", &mongo)
 
-	if err != nil {
-		panic(err)
-	}
+	loadConfiguration("resources/persistence.json", &mongo)
 
 	return &mongo
 }
 
 func createHTTPConfig() *http {
 	http := http{}
-	err := gonfig.GetConf("resources/http.json", &http)
 
-	if err != nil {
-		panic(err)
-	}
+	loadConfiguration("resources/http.json", &http)
 
 	return &http
+}
+
+func createServicesConfig() *services {
+	services := services{}
+
+	loadConfiguration("resources/services.json", &services)
+
+	return &services
 }
