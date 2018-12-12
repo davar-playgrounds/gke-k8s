@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/tkanos/gonfig"
+	"log"
 	"os"
 	"sync"
 )
@@ -45,20 +46,21 @@ func GetInstance() *configuration {
 	return instance
 }
 
-func loadConfiguration(path string, configuration interface{}) {
-	if _, err := os.Stat(path); !os.IsNotExist(err) {
-		err := gonfig.GetConf(path, &configuration)
-
-		if err != nil {
-			panic(err)
-		}
-	}
+func loadConfiguration(path string, configuration struct{}) {
 }
 
 func createMongoConfig() *mongo {
 	mongo := mongo{}
 
-	loadConfiguration("resources/persistence.json", &mongo)
+	path := "resources/persistence.json"
+
+	if _, err := os.Stat(path); !os.IsNotExist(err) {
+		err := gonfig.GetConf(path, &mongo)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 
 	return &mongo
 }
@@ -66,7 +68,15 @@ func createMongoConfig() *mongo {
 func createHTTPConfig() *http {
 	http := http{}
 
-	loadConfiguration("resources/http.json", &http)
+	path := "resources/http.json"
+
+	if _, err := os.Stat(path); !os.IsNotExist(err) {
+		err := gonfig.GetConf(path, &http)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 
 	return &http
 }
@@ -74,7 +84,15 @@ func createHTTPConfig() *http {
 func createServicesConfig() *services {
 	services := services{}
 
-	loadConfiguration("resources/services.json", &services)
+	path := "resources/services.json"
+
+	if _, err := os.Stat(path); !os.IsNotExist(err) {
+		err := gonfig.GetConf(path, &services)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 
 	return &services
 }
