@@ -26,9 +26,9 @@ type http struct {
 }
 
 type services struct {
-	Airports  int `env:"SERVICE_AIRPORTS"`
-	Countries int `env:"SERVICE_COUNTRIES"`
-	Runways   int `env:"SERVICE_RUNWAYS"`
+	Airports  string `env:"SERVICE_AIRPORTS"`
+	Countries string `env:"SERVICE_COUNTRIES"`
+	Runways   string `env:"SERVICE_RUNWAYS"`
 }
 
 var instance *configuration
