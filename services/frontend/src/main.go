@@ -51,16 +51,20 @@ func routeTraffic(router *mux.Router, host string, endpoint string) {
 		resp, err := client.Get(url)
 		if err != nil {
 			helper.PrintErrorMessage(w, 500, "Routing error; service down")
-			log.Panic(err)
+			log.Print(err)
+			return
 		}
 
 		defer resp.Body.Close()
 
-		w.Header().Set("Content-Type", r.Header.Get("Content-Type"))
+		w.Header().Set("Content-Type", resp.Header.Get("Content-Type"))
+		w.Header().Set("Content-Length", resp.Header.Get("Content-Length"))
+		w.WriteHeader(resp.StatusCode)
 
 		if _, err := io.Copy(w, resp.Body); err != nil {
 			helper.PrintErrorMessage(w, 500, "Error creating response")
-			log.Panic(err)
+			log.Print(err)
+			return
 		}
 
 	}).Methods("GET")
