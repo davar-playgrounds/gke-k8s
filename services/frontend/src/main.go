@@ -82,7 +82,11 @@ func main() {
 	routeTraffic(router, conf.Services.Countries, "/countries")
 	routeTraffic(router, conf.Services.Countries, "/countries/{id}")
 
+	routeTraffic(router, conf.Services.Runways, "/runways")
+	routeTraffic(router, conf.Services.Runways, "/runways/{id}")
 
+	routeTraffic(router, conf.Services.Airports, "/airports")
+	routeTraffic(router, conf.Services.Airports, "/airports/{id}")
 
 	log.Panic(http.ListenAndServe(fmt.Sprintf(":%v", conf.Http.Port), router))
 }
