@@ -8,6 +8,26 @@
 <body>
 <script type='text/x-template' id='main-template'>
     <listcountries-component></listcountries-component>
+    <listairports-component></listairports-component>
+</script>
+<script type='text/x-template' id='listAirports-template'>
+    <section>
+        <header>
+            Airports
+        </header>
+        <main>
+            <div style="display: flex; margin-bottom: 10px;">
+                <input placeholder="Search..." v-on:input="onSearch" v-model="airportSearch" value=".*" />
+            </div>
+            <div v-for="(data, index) in airports" class="item_block" v-on:click="selectAirport(data.id)">
+                <div class="item_block__code" v-text="data.code"></div>
+                <div class="item_block__name" v-text="data.name"></div>
+            </div>
+            <div v-if="airports.length == 0">
+                No entries found...
+            </div>
+        </main>
+    </section>
 </script>
 <script type='text/x-template' id='listCountries-template'>
     <section>

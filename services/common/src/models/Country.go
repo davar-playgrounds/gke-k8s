@@ -1,10 +1,10 @@
 package models
 
 type Country struct {
-	ID           int    `json:"id,omitempty"`
-	Code         string `json:"code,omitempty"`
-	Name         string `json:"name,omitempty"`
-	Continent    string `json:"continent,omitempty"`
-	WikipediaUri string `json:"wikipedia_link,omitempty"`
-	Keywords     string `json:"keywords,omitempty"`
+	ID            int    `json:"id" bson:"id"`
+	Code          string `json:"code" bson:"code"`
+	Name          string `json:"name" bson:"name"`
+	Continent     string `json:"continent" bson:"continent"`
+	WikipediaLink string `json:"wikipedia_link" bson:"wikipedia_link"`
+	Keywords      string `json:"keywords" bson:"keywords"`
 }

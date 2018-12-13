@@ -51,6 +51,9 @@ func GetAirport(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Print("asd")
+	log.Print(result.IsoCountry)
+
 	data, err := json.Marshal(&result)
 
 	if err != nil {
