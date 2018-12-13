@@ -1,13 +1,40 @@
-<html>
+<html xmlns:v-on="http://www.w3.org/1999/xhtml">
 <head>
     <title>Hello World</title>
+    <link href="https://fonts.googleapis.com/css?family=Raleway:300|Roboto" rel="stylesheet">
+    <link rel="stylesheet" href="reset.css">
+    <link rel="stylesheet" href="app.css">
 </head>
 <body>
+<script type='text/x-template' id='main-template'>
+    <listcountries-component></listcountries-component>
+</script>
+<script type='text/x-template' id='listCountries-template'>
+    <section>
+        <header>
+            Countries
+        </header>
+        <main>
+            <div style="display: flex; margin-bottom: 10px;">
+                <input placeholder="Search..." v-on:input="onSearch" v-model="countrySearch" value=".*" />
+            </div>
+            <div v-for="(data, index) in countries" class="item_block" v-on:click="selectCountry(data.id)">
+                <div class="item_block__code" v-text="data.code"></div>
+                <div class="item_block__name" v-text="data.name"></div>
+            </div>
+            <div v-if="countries.length == 0">
+                No entries found...
+            </div>
+        </main>
+    </section>
+</script>
 <header>
-    Header
+    Kubernetes Airports Application
 </header>
-<main>
-    Hello
+<main id="vuejs">
+    Loading...
 </main>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script defer src="app.js"></script>
 </body>
 </html>

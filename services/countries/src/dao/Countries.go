@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"fmt"
 	"github.com/mhaddon/gke-k8s/services/common/src/persistence"
 	"github.com/mhaddon/gke-k8s/services/common/src/helper"
 	"github.com/mhaddon/gke-k8s/services/common/src/models"
@@ -17,6 +18,29 @@ func GetCountries(w http.ResponseWriter, r *http.Request) {
 
 	if err := persistence.GetCollection().Find(nil).All(&result); err != nil {
 		helper.PrintErrorMessage(w, 500, "Could not process request")
+		log.Print(err)
+		return
+	}
+
+	data, err := json.Marshal(&result)
+
+	if err != nil {
+		helper.PrintErrorMessage(w, 500,"Could not process response")
+		log.Print(err)
+		return
+	}
+
+	helper.PrintMessage(w, 200, data)
+}
+
+func SearchCountries(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	query := params["query"]
+
+	result := make([]models.Country, 0, 10)
+
+	if err := persistence.GetCollection().Find( bson.M{ "$or": []bson.M{ bson.M{"code": bson.RegEx{fmt.Sprintf("^%s$", query), "i"}}, bson.M{"name": bson.RegEx{query, "i"}} } } ).All(&result); err != nil {
+		helper.PrintErrorMessage(w, 404,"Entry not found")
 		log.Print(err)
 		return
 	}

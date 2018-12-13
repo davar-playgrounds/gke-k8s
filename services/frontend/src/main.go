@@ -12,22 +12,12 @@ import (
 	"time"
 )
 
-func serveIndex(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html")
+func serveFile(router *mux.Router, endpoint string, filePath string, mimeType string) {
+	router.HandleFunc(endpoint, func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", mimeType)
 
-	http.ServeFile(w, r, "resources/static/index.html")
-}
-
-func serveCSS(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/css")
-
-	http.ServeFile(w, r, "resources/static/app.css")
-}
-
-func serveJS(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/javascript")
-
-	http.ServeFile(w, r, "resources/static/app.js")
+		http.ServeFile(w, r, filePath)
+	}).Methods("GET")
 }
 
 func routeTraffic(router *mux.Router, host string, endpoint string) {
@@ -75,11 +65,14 @@ func main() {
 
 	router := mux.NewRouter()
 	fmt.Printf("\nHello, serving Frontend on port :%v", conf.Http.Port)
-	router.HandleFunc("/", serveIndex).Methods("GET")
-	router.HandleFunc("/app.js", serveJS).Methods("GET")
-	router.HandleFunc("/app.css", serveCSS).Methods("GET")
+
+	serveFile(router, "/", "resources/static/index.html", "text/html")
+	serveFile(router, "/app.js", "resources/static/app.js", "application/javascript")
+	serveFile(router, "/app.css", "resources/static/app.css", "text/css")
+	serveFile(router, "/reset.css", "resources/static/reset.css", "text/css")
 
 	routeTraffic(router, conf.Services.Countries, "/countries")
+	routeTraffic(router, conf.Services.Countries, "/countries/search/{query}")
 	routeTraffic(router, conf.Services.Countries, "/countries/{id}")
 
 	routeTraffic(router, conf.Services.Runways, "/runways")
