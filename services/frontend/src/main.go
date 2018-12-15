@@ -20,20 +20,14 @@ func main() {
 	helper.ServeFile(router, "/app.css", "resources/static/app.css", "text/css")
 	helper.ServeFile(router, "/reset.css", "resources/static/reset.css", "text/css")
 
-	helper.RouteTraffic(router, conf.Services.Countries, "/countries")
 	helper.RouteTraffic(router, conf.Services.Countries, "/countries/search/{query}")
-	helper.RouteTraffic(router, conf.Services.Countries, "/countries/{id}")
 
-	helper.RouteTraffic(router, conf.Services.Runways, "/runways")
 	helper.RouteTraffic(router, conf.Services.Runways, "/runways/airport_ident/{query}")
-	helper.RouteTraffic(router, conf.Services.Runways, "/runways/{id}")
 
 	helper.RouteTraffic(router, conf.Services.RunwaysCountry, "/runways-country/country_code/{country_code}")
 	helper.RouteTraffic(router, conf.Services.RunwaysCountry, "/runways-country/country_code/{country_code}/search/{query}")
 
-	helper.RouteTraffic(router, conf.Services.Airports, "/airports")
 	helper.RouteTraffic(router, conf.Services.Airports, "/airports/country_code/{country_code}/search/{query}")
-	helper.RouteTraffic(router, conf.Services.Airports, "/airports/{id}")
 
 	log.Panic(http.ListenAndServe(fmt.Sprintf(":%v", conf.Http.Port), router))
 }
