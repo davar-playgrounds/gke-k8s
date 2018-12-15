@@ -1,7 +1,6 @@
 *.tar.gz
 secrets
 data/json
-docker/jenkins
 services/country/bin
 services/frontend/bin
 services/runways/bin

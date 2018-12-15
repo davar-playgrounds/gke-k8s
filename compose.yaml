@@ -2,20 +2,104 @@ version: '3.1'
 
 services:
 
-  mongo:
+  mongo-runways:
     image: mongo
     restart: always
-    ports:
-      - 27017:27017
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
+
+  mongo-airports:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  mongo-countries:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  mongo-express-runways:
+    image: mongo-express
+    restart: always
+    ports:
+      - 9081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_SERVER: mongo-runways
+
+  mongo-express-airports:
+    image: mongo-express
+    restart: always
+    ports:
+      - 9082:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_SERVER: mongo-airports
+
+  mongo-express-countries:
+    image: mongo-express
+    restart: always
+    ports:
+      - 9083:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_SERVER: mongo-countries
+
+  mongo-seed-airports:
+    image: mongo-seed
+    links:
+      - mongo-airports
+    volumes:
+      -  ${PWD}/data/json/airports.json:/app/data.json
+    environment:
+      MONGO_DOMAIN: mongo-airports
+      MONGO_PORT: 27017
+      MONGO_USERNAME: root
+      MONGO_PASSWORD: example
+      MONGO_COLLECTION: airports
+      MONGO_DB: airports
+
+  mongo-seed-countries:
+    image: mongo-seed
+    links:
+      - mongo-countries
+    volumes:
+      - ${PWD}/data/json/countries.json:/app/data.json
+    environment:
+      MONGO_DOMAIN: mongo-countries
+      MONGO_PORT: 27017
+      MONGO_USERNAME: root
+      MONGO_PASSWORD: example
+      MONGO_COLLECTION: countries
+      MONGO_DB: countries
+
+  mongo-seed-runways:
+    image: mongo-seed
+    links:
+      - mongo-runways
+    volumes:
+      - ${PWD}/data/json/runways.json:/app/data.json
+    environment:
+      MONGO_DOMAIN: mongo-runways
+      MONGO_PORT: 27017
+      MONGO_USERNAME: root
+      MONGO_PASSWORD: example
+      MONGO_COLLECTION: runways
+      MONGO_DB: runways
 
   frontend-service:
     image: frontend
     restart: always
     ports:
-      - 9093:9090
+      - 9090:9090
     environment:
       HTTP_PORT: 9090
       SERVICE_AIRPORTS: http://airport-service:9090
@@ -26,8 +110,6 @@ services:
   runways-country-service:
     image: runways-country
     restart: always
-    ports:
-      - 9094:9090
     environment:
       HTTP_PORT: 9090
       SERVICE_AIRPORTS: http://airport-service:9090
@@ -36,11 +118,9 @@ services:
   runway-service:
     image: runways
     restart: always
-    ports:
-      - 9092:9090
     environment:
       HTTP_PORT: 9090
-      MONGO_DOMAIN: mongo
+      MONGO_DOMAIN: mongo-runways
       MONGO_PORT: 27017
       MONGO_USERNAME: root
       MONGO_PASSWORD: example
@@ -50,11 +130,9 @@ services:
   airport-service:
     image: airports
     restart: always
-    ports:
-      - 9091:9090
     environment:
       HTTP_PORT: 9090
-      MONGO_DOMAIN: mongo
+      MONGO_DOMAIN: mongo-airports
       MONGO_PORT: 27017
       MONGO_USERNAME: root
       MONGO_PASSWORD: example
@@ -64,64 +142,11 @@ services:
   country-service:
     image: countries
     restart: always
-    ports:
-      - 9090:9090
     environment:
       HTTP_PORT: 9090
-      MONGO_DOMAIN: mongo
+      MONGO_DOMAIN: mongo-countries
       MONGO_PORT: 27017
       MONGO_USERNAME: root
       MONGO_PASSWORD: example
       MONGO_COLLECTION: countries
       MONGO_DB: countries
-
-  mongo-seed-airports:
-    image: mongo-seed
-    links:
-      - mongo
-    volumes:
-      -  ${PWD}/data/json/airports.json:/app/data.json
-    environment:
-      MONGO_DOMAIN: mongo
-      MONGO_PORT: 27017
-      MONGO_USERNAME: root
-      MONGO_PASSWORD: example
-      MONGO_COLLECTION: airports
-      MONGO_DB: airports
-
-  mongo-seed-countries:
-    image: mongo-seed
-    links:
-      - mongo
-    volumes:
-      - ${PWD}/data/json/countries.json:/app/data.json
-    environment:
-      MONGO_DOMAIN: mongo
-      MONGO_PORT: 27017
-      MONGO_USERNAME: root
-      MONGO_PASSWORD: example
-      MONGO_COLLECTION: countries
-      MONGO_DB: countries
-
-  mongo-seed-runways:
-    image: mongo-seed
-    links:
-      - mongo
-    volumes:
-      - ${PWD}/data/json/runways.json:/app/data.json
-    environment:
-      MONGO_DOMAIN: mongo
-      MONGO_PORT: 27017
-      MONGO_USERNAME: root
-      MONGO_PASSWORD: example
-      MONGO_COLLECTION: runways
-      MONGO_DB: runways
-
-  mongo-express:
-    image: mongo-express
-    restart: always
-    ports:
-      - 9081:8081
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example
