@@ -32,6 +32,29 @@ func GetRunways(w http.ResponseWriter, r *http.Request) {
 	helper.PrintMessage(w, 200, data)
 }
 
+func GetRunwaysByAirportIdent(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	airportIdent := params["airport_ident"]
+
+	result := make([]models.Runway, 0, 10)
+
+	if err := persistence.GetCollection().Find(bson.M{"airport_ident": airportIdent}).All(&result); err != nil {
+		helper.PrintErrorMessage(w, 404,"Entry not found")
+		log.Print(err)
+		return
+	}
+
+	data, err := json.Marshal(&result)
+
+	if err != nil {
+		helper.PrintErrorMessage(w, 500,"Could not process response")
+		log.Print(err)
+		return
+	}
+
+	helper.PrintMessage(w, 200, data)
+}
+
 func GetRunway(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 

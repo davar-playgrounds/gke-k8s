@@ -7,8 +7,30 @@
 </head>
 <body>
 <script type='text/x-template' id='main-template'>
-    <listcountries-component></listcountries-component>
-    <listairports-component></listairports-component>
+    <div style="display: flex; justify-content: center;">
+        <listcountries-component></listcountries-component>
+        <listairports-component></listairports-component>
+        <listrunways-component></listrunways-component>
+    </div>
+</script>
+<script type='text/x-template' id='listRunways-template'>
+    <section>
+        <header>
+            Runways
+        </header>
+        <main>
+            <div v-for="(data, index) in runways" class="item_block" style="cursor: auto;">
+                <div class="item_block__code item_block__code--large" v-text="data.airport_ident"></div>
+                <div class="item_block__name" v-text="data.id"></div>
+                <div> - </div>
+                <div class="item_block__name" v-text="data.surface"></div>
+            </div>
+            <div v-if="message.length > 0 && runways.length == 0" v-text="message"></div>
+            <div v-else-if="runways.length == 0">
+                No entries found...
+            </div>
+        </main>
+    </section>
 </script>
 <script type='text/x-template' id='listAirports-template'>
     <section>
@@ -19,11 +41,12 @@
             <div style="display: flex; margin-bottom: 10px;">
                 <input placeholder="Search..." v-on:input="onSearch" v-model="airportSearch" value=".*" />
             </div>
-            <div v-for="(data, index) in airports" class="item_block" v-on:click="selectAirport(data.id)">
-                <div class="item_block__code" v-text="data.code"></div>
+            <div v-for="(data, index) in airports" class="item_block" v-on:click="selectAirport(data.ident)" :class="{ 'item_block--selected' : selected == data.ident}">
+                <div class="item_block__code" v-text="data.iso_country"></div>
                 <div class="item_block__name" v-text="data.name"></div>
             </div>
-            <div v-if="airports.length == 0">
+            <div v-if="message.length > 0 && airports.length == 0" v-text="message"></div>
+            <div v-else-if="airports.length == 0">
                 No entries found...
             </div>
         </main>
@@ -38,11 +61,12 @@
             <div style="display: flex; margin-bottom: 10px;">
                 <input placeholder="Search..." v-on:input="onSearch" v-model="countrySearch" value=".*" />
             </div>
-            <div v-for="(data, index) in countries" class="item_block" v-on:click="selectCountry(data.id)">
+            <div v-for="(data, index) in countries" class="item_block" v-on:click="selectCountry(data.code)" :class="{ 'item_block--selected' : selected == data.code}">
                 <div class="item_block__code" v-text="data.code"></div>
                 <div class="item_block__name" v-text="data.name"></div>
             </div>
-            <div v-if="countries.length == 0">
+            <div v-if="message.length > 0 && countries.length == 0" v-text="message"></div>
+            <div v-else-if="countries.length == 0">
                 No entries found...
             </div>
         </main>

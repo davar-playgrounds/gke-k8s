@@ -7,6 +7,7 @@ go get \
  gopkg.in/mgo.v2 \
  github.com/gorilla/mux \
  github.com/tkanos/gonfig \
+ github.com/mhaddon/gke-k8s/services/common/src/vault \
  github.com/mhaddon/gke-k8s/services/common/src/config \
  github.com/mhaddon/gke-k8s/services/common/src/helper \
  github.com/mhaddon/gke-k8s/services/common/src/models \
@@ -15,4 +16,4 @@ go get \
 
 mkdir -p "${DIR}/bin/"
 
-go build -o "${DIR}/bin/frontend" "${DIR}/src/main.go"
+go build -o "${DIR}/bin/runways-country" "${DIR}/src/main.go"

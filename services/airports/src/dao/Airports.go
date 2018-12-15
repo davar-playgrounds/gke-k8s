@@ -1,6 +1,7 @@
 package dao
 
 import (
+	"fmt"
 	"github.com/mhaddon/gke-k8s/services/common/src/persistence"
 	"github.com/mhaddon/gke-k8s/services/common/src/helper"
 	"github.com/mhaddon/gke-k8s/services/common/src/models"
@@ -17,6 +18,53 @@ func GetAirports(w http.ResponseWriter, r *http.Request) {
 
 	if err := persistence.GetCollection().Find(nil).All(&result); err != nil {
 		helper.PrintErrorMessage(w, 500, "Could not process request")
+		log.Print(err)
+		return
+	}
+
+	data, err := json.Marshal(&result)
+
+	if err != nil {
+		helper.PrintErrorMessage(w, 500,"Could not process response")
+		log.Print(err)
+		return
+	}
+
+	helper.PrintMessage(w, 200, data)
+}
+
+func GetAirportsByCountryCodeAndSearch(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	code := params["code"]
+	query := params["query"]
+
+	result := make([]models.Airport, 0, 10)
+
+	if err := persistence.GetCollection().Find(bson.M{"iso_country": code, "name": bson.RegEx{fmt.Sprintf("%s", query), "i"}}).All(&result); err != nil {
+		helper.PrintErrorMessage(w, 404,"Entry not found")
+		log.Print(err)
+		return
+	}
+
+	data, err := json.Marshal(&result)
+
+	if err != nil {
+		helper.PrintErrorMessage(w, 500,"Could not process response")
+		log.Print(err)
+		return
+	}
+
+	helper.PrintMessage(w, 200, data)
+}
+
+func GetAirportsByCountryCode(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	code := params["code"]
+
+	result := make([]models.Airport, 0, 10)
+
+	if err := persistence.GetCollection().Find(bson.M{"iso_country": code}).All(&result); err != nil {
+		helper.PrintErrorMessage(w, 404,"Entry not found")
 		log.Print(err)
 		return
 	}
@@ -50,9 +98,6 @@ func GetAirport(w http.ResponseWriter, r *http.Request) {
 		log.Print(err)
 		return
 	}
-
-	log.Print("asd")
-	log.Print(result.IsoCountry)
 
 	data, err := json.Marshal(&result)
 

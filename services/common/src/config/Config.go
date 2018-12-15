@@ -27,9 +27,10 @@ type http struct {
 }
 
 type services struct {
-	Airports  string `env:"SERVICE_AIRPORTS"`
-	Countries string `env:"SERVICE_COUNTRIES"`
-	Runways   string `env:"SERVICE_RUNWAYS"`
+	Airports       string `env:"SERVICE_AIRPORTS"`
+	Countries      string `env:"SERVICE_COUNTRIES"`
+	Runways        string `env:"SERVICE_RUNWAYS"`
+	RunwaysCountry string `env:"SERVICE_RUNWAYSCOUNTRY"`
 }
 
 var instance *configuration
@@ -44,9 +45,6 @@ func GetInstance() *configuration {
 		}
 	})
 	return instance
-}
-
-func loadConfiguration(path string, configuration struct{}) {
 }
 
 func createMongoConfig() *mongo {

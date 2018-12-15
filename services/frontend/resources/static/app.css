@@ -54,11 +54,35 @@ input {
     background: #586e77;
     color: white;
     padding: 5px;
-    width: 35px;
     min-width: 35px;
     border-bottom: 1px solid #edf1f7;
     border-right: 1px solid #596e77;
     text-align: center;
+    font-family: 'Roboto', sans-serif;
+}
+
+.item_block__code--large {
+    min-width: 80px;
+}
+
+.item_block--selected {
+    background: #bcffbc;
+}
+
+.item_block--selected .item_block__code {
+    background: #027b02;
+}
+
+.item_block--selected:hover {
+    background: #cef9ce;
+}
+
+.item_block--selected:hover .item_block__code {
+    background: #05a205;
+}
+
+.item_block:last-child .item_block__code {
+    border-bottom: none;
 }
 
 .item_block__name {

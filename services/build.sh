@@ -8,3 +8,4 @@ ${DIR}/airports/build.sh
 ${DIR}/countries/build.sh
 ${DIR}/runways/build.sh
 ${DIR}/frontend/build.sh
+${DIR}/runways-country/build.sh
