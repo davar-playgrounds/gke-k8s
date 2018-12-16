@@ -1,0 +1,17 @@
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  labels:
+    component: jenkins
+    addonmanager.kubernetes.io/mode: Reconcile
+  name: view-jenkins
+  namespace: kube-system
+rules:
+  - apiGroups: [""]
+    resources: ["services"]
+    resourceNames: ["jenkins"]
+    verbs: ["proxy"]
+  - apiGroups: [""]
+    resources: ["services/proxy"]
+    resourceNames: ["jenkins:80"]
+    verbs: ["get", "list", "watch", "create"]

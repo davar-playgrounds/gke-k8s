@@ -1,0 +1,88 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: countries-db-data
+  namespace: ${NAMESPACE}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: countries-db
+  namespace: ${NAMESPACE}
+  labels:
+    component: countries-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: countries-db
+  template:
+    metadata:
+      labels:
+        component: countries-db
+    spec:
+      containers:
+        - name: countries-db
+          image: mongo:4.1
+          resources:
+            limits:
+              cpu: "0.8"
+              memory: 512Mi
+            requests:
+              cpu: "0.2"
+              memory: 128Mi
+          ports:
+            - containerPort: 27017
+              name: transport
+              protocol: TCP
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: 'countries-sa'
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: 'secret'
+          volumeMounts:
+            - mountPath: /data/db
+              name: persistent-volume
+              subPath: mongo/data
+          livenessProbe:
+            exec:
+              command:
+                - /bin/bash
+                - -c
+                - /bin/echo "$(test="$(/usr/bin/mongo localhost:27017/test --quiet <<< 'db.runCommand("ping").ok')"; ((test ^= 1)); /bin/echo "${test}")"
+            initialDelaySeconds: 15
+            periodSeconds: 15
+          readinessProbe:
+            exec:
+              command:
+                - /bin/bash
+                - -c
+                - /bin/echo "$(test="$(/usr/bin/mongo localhost:27017/test --quiet <<< 'db.runCommand("ping").ok')"; ((test ^= 1)); /bin/echo "${test}")"
+            initialDelaySeconds: 15
+            periodSeconds: 15
+      volumes:
+        - name: persistent-volume
+          persistentVolumeClaim:
+            claimName: countries-db-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: countries-db-svc
+  namespace: ${NAMESPACE}
+spec:
+  ports:
+    -  name: transport
+       port: 27017
+       protocol: TCP
+       targetPort: 27017
+  selector:
+    component: countries-db
+  type: ClusterIP
+

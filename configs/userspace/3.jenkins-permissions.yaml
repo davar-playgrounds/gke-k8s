@@ -1,0 +1,16 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ${NAMESPACE}-view-jenkins
+  namespace: jenkins
+  labels:
+    component: jenkins
+    addonmanager.kubernetes.io/mode: Reconcile
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: view-jenkins
+subjects:
+  - kind: ServiceAccount
+    name: ${NAMESPACE}
+    namespace: ${NAMESPACE}
