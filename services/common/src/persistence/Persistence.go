@@ -49,3 +49,7 @@ func connect() *mgo.Session {
 
 	return session
 }
+
+func IsConnected() bool {
+	return GetInstance().Ping() == nil
+}

@@ -15,6 +15,9 @@ func main() {
 	router := mux.NewRouter()
 	fmt.Printf("\nHello, serving Frontend on port :%v", conf.Http.Port)
 
+	router.HandleFunc("/health", helper.AlwaysHealthy).Methods("GET")
+	router.HandleFunc("/alive", helper.AlwaysHealthy).Methods("GET")
+
 	helper.ServeFile(router, "/", "resources/static/index.html", "text/html")
 	helper.ServeFile(router, "/app.js", "resources/static/app.js", "application/javascript")
 	helper.ServeFile(router, "/app.css", "resources/static/app.css", "text/css")

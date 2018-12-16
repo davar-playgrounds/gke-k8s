@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
+	"github.com/mhaddon/gke-k8s/services/common/src/persistence"
 	"io"
 	"log"
 	"net"
@@ -77,4 +78,20 @@ func RouteTraffic(router *mux.Router, host string, endpoint string) {
 			return
 		}
 	}).Methods("GET")
+}
+
+func IsDBHealthy(w http.ResponseWriter, r *http.Request) {
+	IsHealthy(w, persistence.IsConnected())
+}
+
+func AlwaysHealthy(w http.ResponseWriter, r *http.Request) {
+	IsHealthy(w, true)
+}
+
+func IsHealthy(w http.ResponseWriter, healthy bool) {
+	if healthy {
+		PrintMessage(w, 200, []byte("1"))
+	} else {
+		PrintMessage(w, 500, []byte("0"))
+	}
 }

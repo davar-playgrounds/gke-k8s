@@ -14,6 +14,10 @@ func main() {
 
 	router := mux.NewRouter()
 	fmt.Printf("\nHello, serving Runway REST API on port :%v", conf.Http.Port)
+
+	router.HandleFunc("/health", helper.IsDBHealthy).Methods("GET")
+	router.HandleFunc("/alive", helper.IsDBHealthy).Methods("GET")
+
 	router.HandleFunc("/runways", dao.GetRunways).Methods("GET")
 	router.HandleFunc("/runways/airport_ident/{airport_ident}", dao.GetRunwaysByAirportIdent).Methods("GET")
 	router.HandleFunc("/runways/{id}", dao.GetRunway).Methods("GET")
