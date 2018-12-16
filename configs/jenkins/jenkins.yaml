@@ -23,19 +23,27 @@ spec:
       containers:
         - name: jenkins
           image: eu.gcr.io/michaelhaddon-223413/jenkins:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
             - containerPort: 50000
-          readinessProbe:
-            tcpSocket:
-              port: 8080
-            initialDelaySeconds: 40
-            periodSeconds: 20
           securityContext:
             privileged: true
           volumeMounts:
             - mountPath: /var/run
               name: docker-sock
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 40
+            periodSeconds: 20
+          readinessProbe:
+            exec:
+              command:
+                - cat
+                - /var/jenkins_started
+            initialDelaySeconds: 5
+            periodSeconds: 5
       volumes:
         - name: docker-sock
           hostPath:
