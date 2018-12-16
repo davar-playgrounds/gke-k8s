@@ -64,8 +64,8 @@ spec:
                 - /bin/bash
                 - -c
                 - /bin/echo "$(test="$(/usr/bin/mongo localhost:27017/test --quiet <<< 'db.runCommand("ping").ok')"; ((test ^= 1)); /bin/echo "${test}")"
-            initialDelaySeconds: 15
-            periodSeconds: 15
+            initialDelaySeconds: 5
+            periodSeconds: 5
       volumes:
         - name: persistent-volume
           persistentVolumeClaim:
