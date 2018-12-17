@@ -100,4 +100,21 @@ spec:
   selector:
     component: airports-db
   type: ClusterIP
-
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: access-airports-db
+  namespace: kube-system
+spec:
+  podSelector:
+    matchLabels:
+      component: airports-db
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              access-airports-db: "1"
+        - namespaceSelector:
+            matchLabels:
+              name: '${NAMESPACE}'

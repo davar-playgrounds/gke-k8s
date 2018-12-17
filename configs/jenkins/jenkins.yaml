@@ -3,6 +3,17 @@ kind: Namespace
 metadata:
   name: jenkins
 ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: gcloud-cred
+  namespace: jenkins
+type: Opaque
+data:
+  access_token: ${GCLOUD_ACCESS_TOKEN}
+  user_name: ${GCLOUD_USER_NAME}
+  host_name: ${GCLOUD_HOSTNAME}
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -19,6 +30,7 @@ spec:
     metadata:
       labels:
         component: jenkins
+        access-registry: "1"
     spec:
       containers:
         - name: jenkins
@@ -27,6 +39,22 @@ spec:
           ports:
             - containerPort: 8080
             - containerPort: 50000
+          env:
+            - name: GCLOUD_ACCESS_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: gcloud-cred
+                  key: access_token
+            - name: GCLOUD_USER_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: gcloud-cred
+                  key: user_name
+            - name: GCLOUD_HOSTNAME
+              valueFrom:
+                secretKeyRef:
+                  name: gcloud-cred
+                  key: host_name
           securityContext:
             privileged: true
           volumeMounts:

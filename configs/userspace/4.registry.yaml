@@ -2,7 +2,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: registry
-  namespace: ${USERNAME}
+  namespace: ${NAMESPACE}
 spec:
   type: ExternalName
   externalName: registry.kube-system.svc.cluster.local

@@ -19,6 +19,24 @@ type: Opaque
 data:
   config: dmVyc2lvbjogMC4xCmxvZzoKICBmaWVsZHM6CiAgICBzZXJ2aWNlOiByZWdpc3RyeQpzdG9yYWdlOgogIGNhY2hlOgogICAgYmxvYmRlc2NyaXB0b3I6IGlubWVtb3J5CiAgZmlsZXN5c3RlbToKICAgIHJvb3RkaXJlY3Rvcnk6IC92YXIvbGliL3JlZ2lzdHJ5CiAgZGVsZXRlOgogICAgZW5hYmxlZDogdHJ1ZQpodHRwOgogIGFkZHI6IDo1MDAwCiAgaGVhZGVyczoKICAgIFgtQ29udGVudC1UeXBlLU9wdGlvbnM6IFtub3NuaWZmXQpoZWFsdGg6CiAgc3RvcmFnZWRyaXZlcjoKICAgIGVuYWJsZWQ6IHRydWUKICAgIGludGVydmFsOiAxMHMKICAgIHRocmVzaG9sZDogMw==
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: registry
+  namespace: kube-system
+  labels:
+    addonmanager.kubernetes.io/mode: "Reconcile"
+    kubernetes.io/cluster-service: "true"
+    kubernetes.io/name: "Registry"
+spec:
+  ports:
+    - name: registry
+      port: 5000
+      targetPort: 5000
+  selector:
+    component: registry
+  type: ClusterIP
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -35,6 +53,7 @@ spec:
     metadata:
       labels:
         component: registry
+        access-registry: "1"
     spec:
       containers:
         - name: registry
@@ -58,16 +77,18 @@ spec:
               - key: config
                 path: config.yml
 ---
-apiVersion: v1
-kind: Service
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
 metadata:
-  name: registry-svc
+  name: access-registry
   namespace: kube-system
 spec:
-  ports:
-    -  port: 80
-       protocol: TCP
-       targetPort: 5000
-  selector:
-    component: registry
-  type: ClusterIP
+  podSelector:
+    matchLabels:
+      component: registry
+  ingress:
+    - from:
+        - namespaceSelector: {}
+  egress:
+    - to:
+        - namespaceSelector: {}
