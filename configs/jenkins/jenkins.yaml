@@ -13,6 +13,7 @@ data:
   access_token: ${GCLOUD_ACCESS_TOKEN}
   user_name: ${GCLOUD_USER_NAME}
   host_name: ${GCLOUD_HOSTNAME}
+  project_name: ${GCLOUD_PROJECTNAME}
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -30,7 +31,6 @@ spec:
     metadata:
       labels:
         component: jenkins
-        access-registry: "1"
     spec:
       containers:
         - name: jenkins
@@ -55,6 +55,11 @@ spec:
                 secretKeyRef:
                   name: gcloud-cred
                   key: host_name
+            - name: GCLOUD_PROJECTNAME
+              valueFrom:
+                secretKeyRef:
+                  name: gcloud-cred
+                  key: project_name
           securityContext:
             privileged: true
           volumeMounts:
