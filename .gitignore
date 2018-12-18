@@ -6,3 +6,4 @@ services/frontend/bin
 services/runways/bin
 services/airports/bin
 services/runways-country/bin
+gcp_sa.key.json

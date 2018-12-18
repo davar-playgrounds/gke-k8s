@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: airports-db-credentials
+  namespace: ${NAMESPACE}
 type: Opaque
 data:
   username: '${AIRPORTS_DB_USR_B64}'
@@ -38,7 +39,7 @@ spec:
     spec:
       containers:
         - name: airports-db
-          image: mongo:4.1
+          image: mongo:${SERVICE_MONGO_VER}
           resources:
             limits:
               cpu: "0.8"

@@ -29,7 +29,7 @@ spec:
     spec:
       containers:
         - name: runways-db
-          image: mongo:4.1
+          image: mongo:${SERVICE_MONGO_VER}
           resources:
             limits:
               cpu: "0.8"

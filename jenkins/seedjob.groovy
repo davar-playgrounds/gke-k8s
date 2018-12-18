@@ -95,3 +95,27 @@ pipelineJob("Build/BuildAll") {
     }
   }
 }
+
+pipelineJob("Deployments/deploydb") {
+  parameters {
+    gitParam('GIT_TAG_NAME') {
+      description('Git tag or branch of project repo')
+      type('BRANCH_TAG')
+      sortMode('ASCENDING')
+      defaultValue('origin/master')
+    }
+
+    stringParam("NAMESPACE", "michael", "Namespace to deploy to")
+  }
+
+  environmentVariables {
+    env("CONFIG_PATH", "airports-app/airports-db.yaml")
+  }
+
+  definition {
+    cpsScmFlowDefinition {
+      scm(scmConfiguration('${GIT_TAG_NAME}'))
+      scriptPath("./jenkins/apply-config.pipeline.groovy")
+    }
+  }
+}

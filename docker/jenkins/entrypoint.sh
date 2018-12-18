@@ -19,5 +19,8 @@ if [[ ! -d /var/jenkins_home/plugins ]]; then
       git-parameter
 fi
 
+echo "Configuring GCP SDK"
+/configs/install_gc_sdk.sh
+
 echo "Starting Jenkins"
 /configs/create_init_job.sh & /sbin/tini -- /usr/local/bin/jenkins.sh $@

@@ -5,4 +5,5 @@ gcloud container clusters create mhaddon-k8-test \
  --num-nodes="3" \
  --addons="KubernetesDashboard" \
  --enable-network-policy \
- --no-enable-legacy-authorization
+ --no-enable-legacy-authorization \
+ --scopes storage-rw

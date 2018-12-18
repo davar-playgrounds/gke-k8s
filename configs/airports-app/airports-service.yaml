@@ -1,24 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: airports-db
+  name: airports
   namespace: ${NAMESPACE}
   labels:
-    component: airports-db
+    component: airports
 spec:
   replicas: 1
   selector:
     matchLabels:
-      component: airports-db
+      component: airports
   template:
     metadata:
       labels:
-        component: airports-db
+        component: airports
         access-airports-db: "1"
     spec:
       containers:
-        - name: airports-db
-          image: mongo:4.1
+        - name: airports
+          image: ${GCLOUD_HOSTNAME}/${GCLOUD_PROJECTNAME}/airports:${SERVICE_AIRPORTS_VER}
           resources:
             limits:
               cpu: "1"
@@ -27,9 +27,7 @@ spec:
               cpu: "0.5"
               memory: 64Mi
           ports:
-            - containerPort: 27017
-              name: transport
-              protocol: TCP
+            - containerPort: 8080
           env:
             - name: MONGO_USERNAME
               valueFrom:
@@ -65,15 +63,33 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: airports-db-svc
+  name: airports-svc
   namespace: ${NAMESPACE}
 spec:
   ports:
     -  name: transport
-       port: 27017
+       port: 80
        protocol: TCP
-       targetPort: 27017
+       targetPort: 8080
   selector:
-    component: airports-db
+    component: airports
   type: ClusterIP
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: access-airports
+  namespace: ${NAMESPACE}
+spec:
+  podSelector:
+    matchLabels:
+      component: airports
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              access-airports: "1"
+        - namespaceSelector:
+            matchLabels:
+              name: '${NAMESPACE}'
 

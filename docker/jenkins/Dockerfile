@@ -12,7 +12,7 @@ ADD https://storage.googleapis.com/kubernetes-release/release/v1.13.1/bin/linux/
 RUN chown jenkins:jenkins /configs && \
     chmod +x /usr/local/bin/kubectl && \
     apk update -q && \
-    apk add jq wget openrc docker gettext libintl curl bash --no-cache && \
+    apk add jq wget openrc docker gettext libintl curl bash python --no-cache && \
     rc-update add docker boot && \
     git config --global user.email "jenkins@haddon.me" && \
     git config --global user.name "Jenkins"
