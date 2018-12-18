@@ -6,7 +6,15 @@ folder("Build") {
     displayName("Build Containers")
 }
 
-Closure scmConfiguration(String gitUrl = 'https://github.com/mhaddon/gke-k8s', String branch = "*/master") {
+folder("Build/services") {
+  displayName("Build Go Services")
+}
+
+folder("Build/docker") {
+  displayName("Build Generic Docker Containers")
+}
+
+Closure scmConfiguration(String branch = "*/master", String gitUrl = 'https://github.com/mhaddon/gke-k8s') {
   return {
     gitSCM {
       branches {
@@ -33,21 +41,57 @@ Closure scmConfiguration(String gitUrl = 'https://github.com/mhaddon/gke-k8s', S
   }
 }
 
-["airports", "countries", "frontend", "runways", "runways-country"].each { goService ->
-  pipelineJob("Build/${goService}") {
+[
+  [ name: "airports", path: "services" ],
+  [ name: "countries", path: "services" ],
+  [ name: "frontend", path: "services" ],
+  [ name: "runways", path: "services" ],
+  [ name: "runways-country", path: "services" ],
+  [ name: "jenkins", path: "docker" ],
+  [ name: "mongo-seed", path: "docker" ]
+].each { environment ->
+  pipelineJob("Build/${environment.path}/${environment.name}") {
     parameters {
+      gitParam('GIT_TAG_NAME') {
+        description('Git tag or branch of project repo')
+        type('BRANCH_TAG')
+        sortMode('ASCENDING')
+        defaultValue('origin/master')
+      }
+
       stringParam("IMAGE_TAG", "latest", "Tag of docker image")
     }
 
     environmentVariables {
-      env("SERVICE_NAME", "${goService}")
+      env("SERVICE_NAME", "${environment.name}")
+      env("CONTAINER_PATH", "${environment.path}")
     }
 
     definition {
       cpsScmFlowDefinition {
-        scm(scmConfiguration())
-        scriptPath("./jenkins/build-go-service.pipeline.groovy")
+        scm(scmConfiguration('${GIT_TAG_NAME}'))
+        scriptPath("./jenkins/build-docker.pipeline.groovy")
       }
+    }
+  }
+}
+
+pipelineJob("Build/BuildAll") {
+  parameters {
+    gitParam('GIT_TAG_NAME') {
+      description('Git tag or branch of project repo')
+      type('BRANCH_TAG')
+      sortMode('ASCENDING')
+      defaultValue('origin/master')
+    }
+
+    stringParam("IMAGE_TAG", "latest", "Tag of docker image")
+  }
+
+  definition {
+    cpsScmFlowDefinition {
+      scm(scmConfiguration('${GIT_TAG_NAME}'))
+      scriptPath("./jenkins/build-all-docker.pipeline.groovy")
     }
   }
 }
