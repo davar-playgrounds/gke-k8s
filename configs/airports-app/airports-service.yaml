@@ -21,10 +21,10 @@ spec:
           image: ${GCLOUD_HOSTNAME}/${GCLOUD_PROJECTNAME}/airports:${SERVICE_AIRPORTS_VER}
           resources:
             limits:
-              cpu: "1"
+              cpu: "350m"
               memory: 256Mi
             requests:
-              cpu: "0.5"
+              cpu: "200m"
               memory: 64Mi
           ports:
             - containerPort: 8080
@@ -63,7 +63,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: airports-svc
+  name: airports
   namespace: ${NAMESPACE}
 spec:
   ports:
@@ -92,4 +92,3 @@ spec:
         - namespaceSelector:
             matchLabels:
               name: '${NAMESPACE}'
-

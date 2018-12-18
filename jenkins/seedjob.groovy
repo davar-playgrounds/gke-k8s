@@ -95,27 +95,31 @@ pipelineJob("Build/BuildAll") {
     }
   }
 }
+[
+  [ name: "airports-db", path: "airports-app/airports-db.yaml" ],
+  [ name: "airports-service", path: "airports-app/airports-service.yaml" ]
+].each { environment ->
+  pipelineJob("Deployments/${environment.name}") {
+    parameters {
+      gitParam('GIT_TAG_NAME') {
+        description('Git tag or branch of project repo')
+        type('BRANCH_TAG')
+        sortMode('ASCENDING')
+        defaultValue('origin/master')
+      }
 
-pipelineJob("Deployments/deploydb") {
-  parameters {
-    gitParam('GIT_TAG_NAME') {
-      description('Git tag or branch of project repo')
-      type('BRANCH_TAG')
-      sortMode('ASCENDING')
-      defaultValue('origin/master')
+      stringParam("NAMESPACE", "michael", "Namespace to deploy to")
     }
 
-    stringParam("NAMESPACE", "michael", "Namespace to deploy to")
-  }
+    environmentVariables {
+      env("CONFIG_PATH", "${environment.path}")
+    }
 
-  environmentVariables {
-    env("CONFIG_PATH", "airports-app/airports-db.yaml")
-  }
-
-  definition {
-    cpsScmFlowDefinition {
-      scm(scmConfiguration('${GIT_TAG_NAME}'))
-      scriptPath("./jenkins/apply-config.pipeline.groovy")
+    definition {
+      cpsScmFlowDefinition {
+        scm(scmConfiguration('${GIT_TAG_NAME}'))
+        scriptPath("./jenkins/apply-config.pipeline.groovy")
+      }
     }
   }
 }

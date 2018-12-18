@@ -42,10 +42,10 @@ spec:
           image: mongo:${SERVICE_MONGO_VER}
           resources:
             limits:
-              cpu: "0.8"
+              cpu: "250m"
               memory: 512Mi
             requests:
-              cpu: "0.2"
+              cpu: "100m"
               memory: 128Mi
           ports:
             - containerPort: 27017
@@ -71,7 +71,7 @@ spec:
               command:
                 - /bin/bash
                 - -c
-                - /bin/echo "$(test="$(/usr/bin/mongo localhost:27017/test --quiet <<< 'db.runCommand("ping").ok')"; ((test ^= 1)); /bin/echo "${test}")"
+                - /bin/echo "$(test="$(/usr/bin/mongo --username '$MONGO_INITDB_ROOT_USERNAME' --password '$MONGO_INITDB_ROOT_PASSWORD' localhost:27017/test --quiet <<< 'db.runCommand("ping").ok')"; ((test ^= 1)); /bin/echo "${test}")"
             initialDelaySeconds: 15
             periodSeconds: 15
           readinessProbe:
@@ -79,7 +79,7 @@ spec:
               command:
                 - /bin/bash
                 - -c
-                - /bin/echo "$(test="$(/usr/bin/mongo localhost:27017/test --quiet <<< 'db.runCommand("ping").ok')"; ((test ^= 1)); /bin/echo "${test}")"
+                - /bin/echo "$(test="$(/usr/bin/mongo --username '$MONGO_INITDB_ROOT_USERNAME' --password '$MONGO_INITDB_ROOT_PASSWORD' localhost:27017/test --quiet <<< 'db.runCommand("ping").ok')"; ((test ^= 1)); /bin/echo "${test}")"
             initialDelaySeconds: 5
             periodSeconds: 5
       volumes:
@@ -90,7 +90,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: airports-db-svc
+  name: airports-db
   namespace: ${NAMESPACE}
 spec:
   ports:

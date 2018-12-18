@@ -44,7 +44,7 @@ func connect() *mgo.Session {
 
 	session, err := mgo.DialWithInfo(dialInfo)
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 
 	return session
