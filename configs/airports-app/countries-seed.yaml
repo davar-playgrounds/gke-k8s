@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: countries-seed
+  namespace: ${NAMESPACE}
+  labels:
+    component: countries-seed
+    access-countries-db: "1"
+spec:
+  restartPolicy: Never
+  containers:
+    - name: countries-seed
+      image: ${GCLOUD_HOSTNAME}/${GCLOUD_PROJECTNAME}/mongo-seed:${SERVICE_MONGO_SEED_VER}
+      imagePullPolicy: Always
+      resources:
+        limits:
+          cpu: "350m"
+          memory: 384Mi
+        requests:
+          cpu: "100m"
+          memory: 128Mi
+      env:
+        - name: MONGO_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: countries-db-credentials
+              key: username
+        - name: MONGO_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: countries-db-credentials
+              key: password
+        - name: MONGO_DOMAIN
+          value: 'countries-db.${NAMESPACE}.svc.cluster.local'
+        - name: MONGO_PORT
+          value: '27017'
+        - name: MONGO_COLLECTION
+          value: 'countries'
+        - name: MONGO_DB
+          value: 'countries'
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: deny-all-access-countries-seed
+  namespace: ${NAMESPACE}
+spec:
+  podSelector:
+    matchLabels:
+      component: countries-seed
+  policyTypes:
+    - Ingress

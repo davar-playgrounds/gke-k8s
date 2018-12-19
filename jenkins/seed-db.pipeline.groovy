@@ -30,7 +30,9 @@ pipeline {
     }
 
     stage('Deploying') {
-      sh "while [[ ! \$(kubectl get pods --namespace ${NAMESPACE} | grep -w 'airports-seed' | awk '{ print \$3 }') = 'Running' ]]; do echo 'Waiting for airports-seed'; sleep 2; done"
+      steps {
+        sh "while [[ ! \$(kubectl get pods --namespace ${NAMESPACE} | grep -w 'airports-seed' | awk '{ print \$3 }') = 'Running' ]]; do echo 'Waiting for airports-seed'; sleep 2; done"
+      }
     }
 
     stage('Upload data') {

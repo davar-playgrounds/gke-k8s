@@ -103,7 +103,15 @@ pipelineJob("Build/BuildAll") {
 [
   [ name: "airports-db", path: "airports-app/airports-db.yaml" ],
   [ name: "airports-service", path: "airports-app/airports-service.yaml" ],
-  [ name: "airports-seed", path: "airports-app/airports-seed.yaml" ]
+  [ name: "airports-seed", path: "airports-app/airports-seed.yaml" ],
+  [ name: "countries-db", path: "airports-app/airports-db.yaml" ],
+  [ name: "countries-service", path: "airports-app/airports-service.yaml" ],
+  [ name: "countries-seed", path: "airports-app/airports-seed.yaml" ],
+  [ name: "runways-db", path: "airports-app/airports-db.yaml" ],
+  [ name: "runways-service", path: "airports-app/airports-service.yaml" ],
+  [ name: "runways-seed", path: "airports-app/airports-seed.yaml" ],
+  [ name: "runways-country-service", path: "airports-app/runways-country-service.yaml" ],
+  [ name: "frontend", path: "airports-app/frontend-service.yaml" ]
 ].each { environment ->
   pipelineJob("Deployments/${environment.name}") {
     parameters {
