@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-gcloud container clusters create mhaddon-k8-test \
+gcloud container clusters create "${CLUSTER_NAME}" \
  --cluster-version="1.11.3-gke.18" \
  --num-nodes="2" \
  --machine-type="n1-standard-4" \

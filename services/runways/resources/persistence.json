@@ -3,6 +3,6 @@
   "Port": 27017,
   "Username": "root",
   "Password": "example",
-  "DB":  "airports",
+  "DB":  "runways",
   "Collection": "app"
 }
