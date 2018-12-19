@@ -2,6 +2,10 @@ folder("Deployments") {
     displayName("Kubernetes Deployments")
 }
 
+folder("Seed") {
+  displayName("Seed data")
+}
+
 folder("Build") {
     displayName("Build Containers")
 }
@@ -95,9 +99,11 @@ pipelineJob("Build/BuildAll") {
     }
   }
 }
+
 [
   [ name: "airports-db", path: "airports-app/airports-db.yaml" ],
-  [ name: "airports-service", path: "airports-app/airports-service.yaml" ]
+  [ name: "airports-service", path: "airports-app/airports-service.yaml" ],
+  [ name: "airports-seed", path: "airports-app/airports-seed.yaml" ]
 ].each { environment ->
   pipelineJob("Deployments/${environment.name}") {
     parameters {
@@ -120,6 +126,26 @@ pipelineJob("Build/BuildAll") {
         scm(scmConfiguration('${GIT_TAG_NAME}'))
         scriptPath("./jenkins/apply-config.pipeline.groovy")
       }
+    }
+  }
+}
+
+pipelineJob("Seed/airports") {
+  parameters {
+    gitParam('GIT_TAG_NAME') {
+      description('Git tag or branch of project repo')
+      type('BRANCH_TAG')
+      sortMode('ASCENDING')
+      defaultValue('origin/master')
+    }
+
+    stringParam("NAMESPACE", "michael", "Namespace to deploy to")
+  }
+
+  definition {
+    cpsScmFlowDefinition {
+      scm(scmConfiguration('${GIT_TAG_NAME}'))
+      scriptPath("./jenkins/seed-db.pipeline.groovy")
     }
   }
 }

@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+echo "Waiting for file:"
+while ! [[ -f "/app/data.json" ]]; do
+    echo -ne "#"
+    sleep 1
+done
+echo " - File loaded."
+
 queryMongoVersion() {
   mongo \
      --authenticationDatabase "admin" \

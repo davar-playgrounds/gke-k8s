@@ -1,7 +1,6 @@
 FROM mongo
 
-RUN mkdir -p /app \
- && echo "{}" > /app/data.json
+RUN mkdir -p /app
 
 COPY entrypoint.sh /app
 
