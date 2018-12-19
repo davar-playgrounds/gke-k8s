@@ -71,7 +71,7 @@ spec:
               command:
                 - /bin/bash
                 - -c
-                - /bin/echo "$(test="$(/usr/bin/mongo --username '$MONGO_INITDB_ROOT_USERNAME' --password '$MONGO_INITDB_ROOT_PASSWORD' localhost:27017/test --quiet <<< 'db.runCommand("ping").ok')"; ((test ^= 1)); /bin/echo "${test}")"
+                - /bin/echo "$(test="$(/usr/bin/mongo --authenticationDatabase admin --username "$MONGO_INITDB_ROOT_USERNAME" --password "$MONGO_INITDB_ROOT_PASSWORD" localhost:27017/test --quiet <<< 'db.runCommand("ping").ok')"; ((test ^= 1)); /bin/echo "${test}")"
             initialDelaySeconds: 15
             periodSeconds: 15
           readinessProbe:
@@ -79,7 +79,7 @@ spec:
               command:
                 - /bin/bash
                 - -c
-                - /bin/echo "$(test="$(/usr/bin/mongo --username '$MONGO_INITDB_ROOT_USERNAME' --password '$MONGO_INITDB_ROOT_PASSWORD' localhost:27017/test --quiet <<< 'db.runCommand("ping").ok')"; ((test ^= 1)); /bin/echo "${test}")"
+                - /bin/echo "$(test="$(/usr/bin/mongo --authenticationDatabase admin --username "$MONGO_INITDB_ROOT_USERNAME" --password "$MONGO_INITDB_ROOT_PASSWORD" localhost:27017/test --quiet <<< 'db.runCommand("ping").ok')"; ((test ^= 1)); /bin/echo "${test}")"
             initialDelaySeconds: 5
             periodSeconds: 5
       volumes:
