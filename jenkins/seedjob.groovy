@@ -80,6 +80,74 @@ Closure scmConfiguration(String branch = "*/master", String gitUrl = 'https://gi
   }
 }
 
+[
+  [ name: "airports-db", path: "airports-app/airports-db.yaml", type: "deployment" ],
+  [ name: "airports-service", path: "airports-app/airports-service.yaml", type: "deployment" ],
+  [ name: "airports-seed", path: "airports-app/airports-seed.yaml", type: "pod" ],
+  [ name: "countries-db", path: "airports-app/airports-db.yaml", type: "deployment" ],
+  [ name: "countries-service", path: "airports-app/airports-service.yaml", type: "deployment" ],
+  [ name: "countries-seed", path: "airports-app/airports-seed.yaml", type: "pod" ],
+  [ name: "runways-db", path: "airports-app/airports-db.yaml", type: "deployment" ],
+  [ name: "runways-service", path: "airports-app/airports-service.yaml", type: "deployment" ],
+  [ name: "runways-seed", path: "airports-app/airports-seed.yaml", type: "pod" ],
+  [ name: "runways-country-service", path: "airports-app/runways-country-service.yaml", type: "deployment" ],
+  [ name: "frontend", path: "airports-app/frontend-service.yaml", type: "deployment" ]
+].each { environment ->
+  pipelineJob("Deployments/${environment.name}") {
+    parameters {
+      gitParam('GIT_TAG_NAME') {
+        description('Git tag or branch of project repo')
+        type('BRANCH_TAG')
+        sortMode('ASCENDING')
+        defaultValue('origin/master')
+      }
+
+      stringParam("NAMESPACE", "michael", "Namespace to deploy to")
+    }
+
+    environmentVariables {
+      env("CONFIG_PATH", "${environment.path}")
+      env("NAME", "${environment.name}")
+      env("TYPE", "${environment.type}")
+    }
+
+    definition {
+      cpsScmFlowDefinition {
+        scm(scmConfiguration('${GIT_TAG_NAME}'))
+        scriptPath("./jenkins/apply-config.pipeline.groovy")
+      }
+    }
+  }
+}
+
+[
+  "airports", "countries", "runways"
+].each { environment ->
+  pipelineJob("Seed/${environment}") {
+    parameters {
+      gitParam('GIT_TAG_NAME') {
+        description('Git tag or branch of project repo')
+        type('BRANCH_TAG')
+        sortMode('ASCENDING')
+        defaultValue('origin/master')
+      }
+
+      stringParam("NAMESPACE", "michael", "Namespace to deploy to")
+    }
+
+    environmentVariables {
+      env("SERVICE_NAME", "${environment}")
+    }
+
+    definition {
+      cpsScmFlowDefinition {
+        scm(scmConfiguration('${GIT_TAG_NAME}'))
+        scriptPath("./jenkins/seed-db.pipeline.groovy")
+      }
+    }
+  }
+}
+
 pipelineJob("Build/BuildAll") {
   parameters {
     gitParam('GIT_TAG_NAME') {
@@ -100,45 +168,7 @@ pipelineJob("Build/BuildAll") {
   }
 }
 
-[
-  [ name: "airports-db", path: "airports-app/airports-db.yaml" ],
-  [ name: "airports-service", path: "airports-app/airports-service.yaml" ],
-  [ name: "airports-seed", path: "airports-app/airports-seed.yaml" ],
-  [ name: "countries-db", path: "airports-app/airports-db.yaml" ],
-  [ name: "countries-service", path: "airports-app/airports-service.yaml" ],
-  [ name: "countries-seed", path: "airports-app/airports-seed.yaml" ],
-  [ name: "runways-db", path: "airports-app/airports-db.yaml" ],
-  [ name: "runways-service", path: "airports-app/airports-service.yaml" ],
-  [ name: "runways-seed", path: "airports-app/airports-seed.yaml" ],
-  [ name: "runways-country-service", path: "airports-app/runways-country-service.yaml" ],
-  [ name: "frontend", path: "airports-app/frontend-service.yaml" ]
-].each { environment ->
-  pipelineJob("Deployments/${environment.name}") {
-    parameters {
-      gitParam('GIT_TAG_NAME') {
-        description('Git tag or branch of project repo')
-        type('BRANCH_TAG')
-        sortMode('ASCENDING')
-        defaultValue('origin/master')
-      }
-
-      stringParam("NAMESPACE", "michael", "Namespace to deploy to")
-    }
-
-    environmentVariables {
-      env("CONFIG_PATH", "${environment.path}")
-    }
-
-    definition {
-      cpsScmFlowDefinition {
-        scm(scmConfiguration('${GIT_TAG_NAME}'))
-        scriptPath("./jenkins/apply-config.pipeline.groovy")
-      }
-    }
-  }
-}
-
-pipelineJob("Seed/airports") {
+pipelineJob("Deployments/DeployAll") {
   parameters {
     gitParam('GIT_TAG_NAME') {
       description('Git tag or branch of project repo')
@@ -153,7 +183,7 @@ pipelineJob("Seed/airports") {
   definition {
     cpsScmFlowDefinition {
       scm(scmConfiguration('${GIT_TAG_NAME}'))
-      scriptPath("./jenkins/seed-db.pipeline.groovy")
+      scriptPath("./jenkins/deploy-all-services.pipeline.groovy")
     }
   }
 }

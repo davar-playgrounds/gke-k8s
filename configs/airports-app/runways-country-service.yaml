@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: runways-country
-          image: ${GCLOUD_HOSTNAME}/${GCLOUD_PROJECTNAME}/runways-country:${SERVICE_AIRPORTS_VER}
+          image: ${GCLOUD_HOSTNAME}/${GCLOUD_PROJECTNAME}/runways-country:${SERVICE_RUNWAYSCOUNTRY_VER}
           resources:
             limits:
               cpu: "350m"

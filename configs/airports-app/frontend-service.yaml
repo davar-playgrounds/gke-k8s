@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: ${GCLOUD_HOSTNAME}/${GCLOUD_PROJECTNAME}/frontend:${SERVICE_AIRPORTS_VER}
+          image: ${GCLOUD_HOSTNAME}/${GCLOUD_PROJECTNAME}/frontend:${SERVICE_FRONTEND_VER}
           resources:
             limits:
               cpu: "350m"
