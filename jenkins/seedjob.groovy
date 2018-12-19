@@ -84,12 +84,12 @@ Closure scmConfiguration(String branch = "*/master", String gitUrl = 'https://gi
   [ name: "airports-db", path: "airports-app/airports-db.yaml", type: "deployment" ],
   [ name: "airports-service", path: "airports-app/airports-service.yaml", type: "deployment" ],
   [ name: "airports-seed", path: "airports-app/airports-seed.yaml", type: "pod" ],
-  [ name: "countries-db", path: "airports-app/airports-db.yaml", type: "deployment" ],
-  [ name: "countries-service", path: "airports-app/airports-service.yaml", type: "deployment" ],
-  [ name: "countries-seed", path: "airports-app/airports-seed.yaml", type: "pod" ],
-  [ name: "runways-db", path: "airports-app/airports-db.yaml", type: "deployment" ],
-  [ name: "runways-service", path: "airports-app/airports-service.yaml", type: "deployment" ],
-  [ name: "runways-seed", path: "airports-app/airports-seed.yaml", type: "pod" ],
+  [ name: "countries-db", path: "airports-app/countries-db.yaml", type: "deployment" ],
+  [ name: "countries-service", path: "airports-app/countries-service.yaml", type: "deployment" ],
+  [ name: "countries-seed", path: "airports-app/countries-seed.yaml", type: "pod" ],
+  [ name: "runways-db", path: "airports-app/runways-db.yaml", type: "deployment" ],
+  [ name: "runways-service", path: "airports-app/runways-service.yaml", type: "deployment" ],
+  [ name: "runways-seed", path: "airports-app/runways-seed.yaml", type: "pod" ],
   [ name: "runways-country-service", path: "airports-app/runways-country-service.yaml", type: "deployment" ],
   [ name: "frontend", path: "airports-app/frontend-service.yaml", type: "deployment" ]
 ].each { environment ->

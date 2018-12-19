@@ -24,6 +24,7 @@ pipeline {
       }
 
       steps {
+        sh "mkdir -p ./data/json"
         sh "csvjson ./data/csv/${env.SERVICE_NAME}.csv > ./data/json/${env.SERVICE_NAME}.json"
         stash(name: 'data', includes: "data/json/*")
       }
