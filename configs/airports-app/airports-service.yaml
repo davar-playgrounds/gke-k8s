@@ -92,3 +92,16 @@ spec:
           namespaceSelector:
             matchLabels:
               name: '${NAMESPACE}'
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: autoscaler-airports
+  namespace: ${NAMESPACE}
+spec:
+  scaleTargetRef:
+    kind: Deployment
+    name: airports
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUUtilizationPercentage: 50

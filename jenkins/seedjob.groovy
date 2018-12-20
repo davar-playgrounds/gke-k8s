@@ -1,5 +1,5 @@
 folder("Deployments") {
-    displayName("Kubernetes Deployments")
+  displayName("Kubernetes Deployments")
 }
 
 folder("Seed") {
@@ -7,7 +7,7 @@ folder("Seed") {
 }
 
 folder("Build") {
-    displayName("Build Containers")
+  displayName("Build Containers")
 }
 
 folder("Build/services") {
@@ -55,6 +55,8 @@ Closure scmConfiguration(String branch = "*/master", String gitUrl = 'https://gi
   [ name: "mongo-seed", path: "docker" ]
 ].each { environment ->
   pipelineJob("Build/${environment.path}/${environment.name}") {
+    displayName("${environment.name}")
+
     parameters {
       gitParam('GIT_TAG_NAME') {
         description('Git tag or branch of project repo')
@@ -93,7 +95,9 @@ Closure scmConfiguration(String branch = "*/master", String gitUrl = 'https://gi
   [ name: "runways-country-service", path: "airports-app/runways-country-service.yaml", type: "deployment" ],
   [ name: "frontend", path: "airports-app/frontend-service.yaml", type: "deployment" ]
 ].each { environment ->
-  pipelineJob("Deployments/${environment.name}") {
+  pipelineJob("Deployments/airports-app/${environment.name}") {
+    displayName("${environment.name}")
+
     parameters {
       gitParam('GIT_TAG_NAME') {
         description('Git tag or branch of project repo')
@@ -124,6 +128,8 @@ Closure scmConfiguration(String branch = "*/master", String gitUrl = 'https://gi
   "airports", "countries", "runways"
 ].each { environment ->
   pipelineJob("Seed/${environment}") {
+    displayName("${environment}")
+
     parameters {
       gitParam('GIT_TAG_NAME') {
         description('Git tag or branch of project repo')
@@ -148,7 +154,9 @@ Closure scmConfiguration(String branch = "*/master", String gitUrl = 'https://gi
   }
 }
 
-pipelineJob("Build/BuildAll") {
+pipelineJob("BuildAll") {
+  displayName("Build All")
+
   parameters {
     gitParam('GIT_TAG_NAME') {
       description('Git tag or branch of project repo')
@@ -168,7 +176,9 @@ pipelineJob("Build/BuildAll") {
   }
 }
 
-pipelineJob("Deployments/DeployAll") {
+pipelineJob("DeployAll") {
+  displayName("Deploy All")
+
   parameters {
     gitParam('GIT_TAG_NAME') {
       description('Git tag or branch of project repo')
@@ -188,7 +198,9 @@ pipelineJob("Deployments/DeployAll") {
   }
 }
 
-pipelineJob("Deployments/DeleteAll") {
+pipelineJob("DeleteAll") {
+  displayName("Delete All")
+
   parameters {
     gitParam('GIT_TAG_NAME') {
       description('Git tag or branch of project repo')
