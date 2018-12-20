@@ -4,7 +4,23 @@
     "admin": true
   },
   {
-    "name": "daniel",
+    "name": "daniel-natallia",
+    "admin": false
+  },
+  {
+    "name": "muhammet-siva",
+    "admin": false
+  },
+  {
+    "name": "cameron-ender",
+    "admin": false
+  },
+  {
+    "name": "manos-matheus",
+    "admin": false
+  },
+  {
+    "name": "vineeth-sepehr",
     "admin": false
   }
 ]

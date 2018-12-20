@@ -27,6 +27,9 @@
   <triggers/>
   <concurrentBuild>false</concurrentBuild>
   <builders>
+    <hudson.tasks.Shell>
+      <command>jq &apos;.[].name&apos; -r &lt; ./configs/users.json | tr &apos;\n&apos; &apos;,&apos; | sed &apos;s/.$//&apos; &gt; ./configs/users</command>
+    </hudson.tasks.Shell>
     <javaposse.jobdsl.plugin.ExecuteDslScripts plugin="job-dsl@1.70">
       <targets>jenkins/seedjob.groovy</targets>
       <usingScriptText>false</usingScriptText>
