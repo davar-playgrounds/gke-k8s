@@ -13,8 +13,9 @@ import (
 func main() {
 	conf := config.GetInstance()
 
+	log.Printf("\nHello, serving Runways-Country Service on port :%v", conf.Http.Port)
+
 	router := mux.NewRouter()
-	fmt.Printf("\nHello, serving Runways-Country Service on port :%v", conf.Http.Port)
 
 	router.HandleFunc("/health", helper.AlwaysHealthy).Methods("GET")
 	router.HandleFunc("/alive", helper.AlwaysHealthy).Methods("GET")

@@ -13,8 +13,9 @@ import (
 func main() {
 	conf := config.GetInstance()
 
+	log.Printf("\nHello, serving Country REST API on port :%v", conf.Http.Port)
+
 	router := mux.NewRouter()
-	fmt.Printf("\nHello, serving Country REST API on port :%v", conf.Http.Port)
 
 	router.HandleFunc("/health", helper.IsDBHealthy).Methods("GET")
 	router.HandleFunc("/alive", helper.IsDBHealthy).Methods("GET")

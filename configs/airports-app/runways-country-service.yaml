@@ -90,5 +90,5 @@ spec:
     kind: Deployment
     name: runways-country
   minReplicas: 1
-  maxReplicas: 2
+  maxReplicas: 3
   targetCPUUtilizationPercentage: 50

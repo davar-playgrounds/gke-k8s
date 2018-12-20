@@ -1,18 +1,19 @@
 package joins
 
 import (
-	"github.com/patrickmn/go-cache"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
-	"github.com/mhaddon/gke-k8s/services/common/src/helper"
-	"github.com/mhaddon/gke-k8s/services/common/src/vault"
 	"github.com/mhaddon/gke-k8s/services/common/src/config"
+	"github.com/mhaddon/gke-k8s/services/common/src/helper"
 	"github.com/mhaddon/gke-k8s/services/common/src/models"
+	"github.com/mhaddon/gke-k8s/services/common/src/vault"
+	"github.com/patrickmn/go-cache"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"sync"
 )
 
 func getRunwaysFromAirportRef(airport_ident string) (*[]models.Runway, error) {
@@ -69,6 +70,38 @@ func getAirportsByCountryCode(country_code string, query string) (*[]models.Airp
 	return &airports, nil
 }
 
+func getRunwaysFromAirportRefAsync(wg *sync.WaitGroup, mutex *sync.Mutex, runways *[]models.Runway, ident string) {
+	defer wg.Done()
+	newRunways, err := getRunwaysFromAirportRef(ident)
+
+	if err != nil {
+		println("Error")
+	}
+
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	println(len(*newRunways))
+
+	*runways = append(*runways, *newRunways...)
+}
+
+func chunkAirports(airports []models.Airport, chunkSize int) [][]models.Airport {
+	var chunkedAirports [][]models.Airport
+
+	for i := 0; i < len(airports); i += chunkSize {
+		end := i + chunkSize
+
+		if end > len(airports) {
+			end = len(airports)
+		}
+
+		chunkedAirports = append(chunkedAirports, airports[i:end])
+	}
+
+	return chunkedAirports
+}
+
 func getRunwaysByCountryCode(country_code string, query string) (*[]models.Runway, error) {
 	runways := make([]models.Runway, 0, 10)
 
@@ -77,15 +110,17 @@ func getRunwaysByCountryCode(country_code string, query string) (*[]models.Runwa
 		return &runways, err
 	}
 
-	for _, element := range *airports {
-		newRunways, err := getRunwaysFromAirportRef(element.Ident)
+	var mutex sync.Mutex
+	var wg sync.WaitGroup
 
-		if err != nil {
-			return &runways, err
+	for _, airportsSubset := range chunkAirports(*airports, 10) {
+		for _, element := range airportsSubset {
+			wg.Add(1)
+			go getRunwaysFromAirportRefAsync(&wg, &mutex, &runways, element.Ident)
 		}
-
-		runways = append(runways, *newRunways...)
+		wg.Wait()
 	}
+	wg.Wait()
 
 	return &runways, nil
 }

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 gcloud container clusters create "${CLUSTER_NAME}" \
- --cluster-version="1.11.3-gke.18" \
- --num-nodes="2" \
- --machine-type="n1-standard-4" \
+ --cluster-version="${CLUSTER_VERSION}" \
+ --num-nodes="${CLUSTER_NODES}" \
+ --machine-type="${CLUSTER_MACHINE_TYPE}" \
  --addons="KubernetesDashboard" \
  --enable-network-policy \
  --no-enable-legacy-authorization \
