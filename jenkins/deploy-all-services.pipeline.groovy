@@ -8,7 +8,7 @@ node {
       group: [ "Seed/airports", "Seed/countries", "Seed/runways" ]
     ], [
       name: "services",
-      group: [ "Deployments/airports-service", "Deployments/countries-service", "Deployments/runways-service", "Deployments/runways-country-service", "Deployments/frontend" ]
+      group: [ "Deployments/airports", "Deployments/countries", "Deployments/runways", "Deployments/runways-country", "Deployments/frontend" ]
     ]
   ].each { deploymentGroup ->
     stage( "${deploymentGroup.name}" ) {

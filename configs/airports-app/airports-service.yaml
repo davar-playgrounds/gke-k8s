@@ -21,7 +21,7 @@ spec:
           image: ${GCLOUD_HOSTNAME}/${GCLOUD_PROJECTNAME}/airports:${SERVICE_AIRPORTS_VER}
           resources:
             limits:
-              cpu: "150m"
+              cpu: "100m"
               memory: 256Mi
             requests:
               cpu: "50m"
@@ -93,15 +93,24 @@ spec:
             matchLabels:
               name: '${NAMESPACE}'
 ---
-apiVersion: autoscaling/v1
+apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
   name: autoscaler-airports
   namespace: ${NAMESPACE}
 spec:
   scaleTargetRef:
+    apiVersion: apps/v1
     kind: Deployment
     name: airports
   minReplicas: 1
   maxReplicas: 2
-  targetCPUUtilizationPercentage: 50
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: 50
+    - type: Pods
+      pods:
+        metricName: current_connections
+        targetAverageValue: 3
