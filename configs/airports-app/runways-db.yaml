@@ -42,10 +42,10 @@ spec:
           image: mongo:${SERVICE_MONGO_VER}
           resources:
             limits:
-              cpu: "250m"
+              cpu: "150m"
               memory: 512Mi
             requests:
-              cpu: "100m"
+              cpu: "50m"
               memory: 128Mi
           ports:
             - containerPort: 27017
@@ -106,7 +106,7 @@ kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
   name: access-runways-db
-  namespace: kube-system
+  namespace: ${NAMESPACE}
 spec:
   podSelector:
     matchLabels:
@@ -116,6 +116,6 @@ spec:
         - podSelector:
             matchLabels:
               access-runways-db: "1"
-        - namespaceSelector:
+          namespaceSelector:
             matchLabels:
               name: '${NAMESPACE}'

@@ -53,7 +53,7 @@ spec:
       serviceAccount: jenkins
       containers:
         - name: jenkins
-          image: eu.gcr.io/michaelhaddon-223413/jenkins:${SERVICE_JENKINS_VER}
+          image: ${GCLOUD_HOSTNAME}/${GCLOUD_PROJECTNAME}/jenkins:${SERVICE_JENKINS_VER}
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
@@ -110,9 +110,6 @@ spec:
     - name: jenkins
       port: 80
       targetPort: 8080
-    - name: jenkins-agent
-      port: 50000
-      targetPort: 50000
   selector:
     component: jenkins
 ---

@@ -38,4 +38,8 @@ After the cluster is setup you can access the cluster as each user with
 
 ./run.sh "$USERNAME"
 
+When you load the dashboard you can use the kube.config file in the secrets/${USERNAME} folder to authenticate. If you are authenticating as a user that is not an admin you will not be able to see the default namespace, or even list the available namespaces. So you have to ensure your URL is pointing to your namespace.
+
 After this you can access Jenkins to build & deploy the rest of the images
+
+The Jenkins credentials are: admin/test

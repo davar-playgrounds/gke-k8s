@@ -24,10 +24,10 @@ spec:
           image: ${GCLOUD_HOSTNAME}/${GCLOUD_PROJECTNAME}/frontend:${SERVICE_FRONTEND_VER}
           resources:
             limits:
-              cpu: "350m"
+              cpu: "150m"
               memory: 256Mi
             requests:
-              cpu: "200m"
+              cpu: "50m"
               memory: 64Mi
           ports:
             - containerPort: 8080

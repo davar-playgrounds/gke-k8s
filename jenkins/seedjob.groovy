@@ -187,3 +187,23 @@ pipelineJob("Deployments/DeployAll") {
     }
   }
 }
+
+pipelineJob("Deployments/DeleteAll") {
+  parameters {
+    gitParam('GIT_TAG_NAME') {
+      description('Git tag or branch of project repo')
+      type('BRANCH_TAG')
+      sortMode('ASCENDING')
+      defaultValue('origin/master')
+    }
+
+    stringParam("NAMESPACE", "michael", "Namespace to purge")
+  }
+
+  definition {
+    cpsScmFlowDefinition {
+      scm(scmConfiguration('${GIT_TAG_NAME}'))
+      scriptPath("./jenkins/purge-namespace.pipeline.groovy")
+    }
+  }
+}

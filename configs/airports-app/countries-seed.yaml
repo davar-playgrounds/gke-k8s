@@ -14,10 +14,10 @@ spec:
       imagePullPolicy: Always
       resources:
         limits:
-          cpu: "350m"
+          cpu: "150m"
           memory: 384Mi
         requests:
-          cpu: "100m"
+          cpu: "50m"
           memory: 128Mi
       env:
         - name: MONGO_USERNAME
