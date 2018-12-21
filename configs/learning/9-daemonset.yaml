@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: hello-world-daemonset
+spec:
+  selector:
+    matchLabels:
+      name: hello-world-daemonset
+  template:
+    metadata:
+      labels:
+        name: hello-world-daemonset
+    spec:
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
+      containers:
+        - name: hello-world-daemonset
+          image: tutum/hello-world
+          resources:
+            limits:
+              cpu: "100m"
+              memory: 128Mi
+            requests:
+              cpu: "50m"
+              memory: 64Mi
+      terminationGracePeriodSeconds: 30

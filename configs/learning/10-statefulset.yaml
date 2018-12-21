@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-world-statefulset
+  labels:
+    component: hello-world-statefulset
+spec:
+  ports:
+    -  name: http
+       port: 80
+       protocol: TCP
+       targetPort: 80
+  selector:
+    component: hello-world-statefulset
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: hello-world-statefulset
+  labels:
+    component: hello-world-statefulset
+spec:
+  serviceName: "hello-world-statefulset"
+  replicas: 2
+  selector:
+    matchLabels:
+      component: hello-world-statefulset
+  template:
+    metadata:
+      labels:
+        component: hello-world-statefulset
+    spec:
+      containers:
+        - name: hello-world-statefulset
+          image: tutum/hello-world
+          resources:
+            limits:
+              cpu: "100m"
+              memory: 128Mi
+            requests:
+              cpu: "50m"
+              memory: 64Mi
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: data
+              mountPath: /data
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi
