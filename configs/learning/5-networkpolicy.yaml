@@ -1,0 +1,13 @@
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: access-hello-world
+spec:
+  podSelector:
+    matchLabels:
+      component: hello-world
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              access-hello-world: "1"
