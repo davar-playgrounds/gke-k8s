@@ -10,6 +10,13 @@ spec:
       containers:
         - name: counter
           image: centos:7
+          resources:
+            limits:
+              cpu: "100m"
+              memory: 128Mi
+            requests:
+              cpu: "50m"
+              memory: 64Mi
           command:
             - "bin/bash"
             - "-c"
