@@ -1,17 +1,117 @@
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: seed-config
+  namespace: ${NAMESPACE}
+data:
+  import-db.sh: |
+    mongoimport \
+       --authenticationDatabase "admin" \
+       --username "${MONGO_USERNAME:-admin}" \
+       --password "${MONGO_PASSWORD:-password}" \
+       --host "${MONGO_DOMAIN:-127.0.0.1}" \
+       --port "${MONGO_PORT:-27017}" \
+       --db "${MONGO_DB:-default}" \
+       --collection "${MONGO_COLLECTION:-app}" \
+       --type "json" \
+       --file "/app/data/data.json" \
+       --jsonArray
+  wait-for-file.sh: |
+    echo "Waiting for file:"
+    while ! [[ -f "/app/data/data.json" ]]; do
+      echo -ne "#"
+      sleep 1
+    done
+    echo " - File loaded."
+  wait-for-db.sh: |
+    queryMongoVersion() {
+      mongo \
+         --authenticationDatabase "admin" \
+         --username "${MONGO_USERNAME:-admin}" \
+         --password "${MONGO_PASSWORD:-password}" \
+         --host "${MONGO_DOMAIN:-127.0.0.1}" \
+         --port "${MONGO_PORT:-27017}" \
+         --eval "db.version()"
+    }
+
+    while ! queryMongoVersion > /dev/null 2>&1; do sleep 1; done
+---
+apiVersion: v1
 kind: Pod
 metadata:
-  name: countries-seed
+  name: ${MONGO_DB}-seed
   namespace: ${NAMESPACE}
   labels:
-    component: countries-seed
-    access-countries-db: "1"
+    component: ${MONGO_DB}-seed
+    access-${MONGO_DB}-db: "1"
 spec:
   restartPolicy: Never
+  volumes:
+    - name: shared-data
+      emptyDir: {}
+    - name: config-volume
+      configMap:
+        name: seed-config
+  initContainers:
+    - name: waiting-for-data
+      image: busybox:${SERVICE_BUSYBOX_VER}
+      command: ["/bin/sh"]
+      args: ['/app/scripts/wait-for-file.sh']
+      resources:
+        limits:
+          cpu: "50m"
+          memory: 384Mi
+        requests:
+          cpu: "20m"
+          memory: 128Mi
+      volumeMounts:
+        - name: shared-data
+          mountPath: /app/data
+        - name: config-volume
+          mountPath: /app/scripts
+          subPath: wait-for-file.sh
+    - name: waiting-for-db
+      image: mongo:${SERVICE_MONGO_VER}
+      command: ["/bin/sh"]
+      args: ['/app/scripts/wait-for-db.sh']
+      resources:
+        limits:
+          cpu: "50m"
+          memory: 64Mi
+        requests:
+          cpu: "20m"
+          memory: 32Mi
+      volumeMounts:
+        - name: config-volume
+          mountPath: /app/scripts
+          subPath: wait-for-db.sh
+      env:
+        - name: MONGO_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: ${MONGO_DB}-db-credentials
+              key: username
+        - name: MONGO_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ${MONGO_DB}-db-credentials
+              key: password
+        - name: MONGO_DOMAIN
+          value: '${MONGO_DB}-db.${NAMESPACE}.svc.cluster.local'
+        - name: MONGO_PORT
+          value: '27017'
+        - name: MONGO_DB
+          value: '${MONGO_DB}'
   containers:
-    - name: countries-seed
-      image: ${GCLOUD_HOSTNAME}/${GCLOUD_PROJECTNAME}/mongo-seed:${SERVICE_MONGO_SEED_VER}
+    - name: seed
+      image: mongo:${SERVICE_MONGO_VER}
       imagePullPolicy: Always
+      volumeMounts:
+        - name: shared-data
+          mountPath: /app/data
+        - name: config-volume
+          mountPath: /app/scripts
+          subPath: wait-for-file.sh
       resources:
         limits:
           cpu: "100m"
@@ -23,30 +123,30 @@ spec:
         - name: MONGO_USERNAME
           valueFrom:
             secretKeyRef:
-              name: countries-db-credentials
+              name: ${MONGO_DB}-db-credentials
               key: username
         - name: MONGO_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: countries-db-credentials
+              name: ${MONGO_DB}-db-credentials
               key: password
         - name: MONGO_DOMAIN
-          value: 'countries-db.${NAMESPACE}.svc.cluster.local'
+          value: '${MONGO_DB}-db.${NAMESPACE}.svc.cluster.local'
         - name: MONGO_PORT
           value: '27017'
         - name: MONGO_COLLECTION
-          value: 'countries'
+          value: '${MONGO_DB}'
         - name: MONGO_DB
-          value: 'countries'
+          value: '${MONGO_DB}'
 ---
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
-  name: deny-all-access-countries-seed
+  name: deny-all-access-${MONGO_DB}-seed
   namespace: ${NAMESPACE}
 spec:
   podSelector:
     matchLabels:
-      component: countries-seed
+      component: ${MONGO_DB}-seed
   policyTypes:
     - Ingress

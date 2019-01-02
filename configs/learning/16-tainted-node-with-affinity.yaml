@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world-tainted-node-affinity
+  labels:
+    component: hello-world-tainted-node-affinity
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      component: hello-world-tainted-node-affinity
+  template:
+    metadata:
+      labels:
+        component: hello-world-tainted-node-affinity
+    spec:
+      tolerations:
+        - key: "nodetype"
+          operator: "Equal"
+          value: "special"
+          effect: "NoSchedule"
+          tolerationSeconds: 5
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: nodetype
+                    operator: In
+                    values:
+                      - special
+      containers:
+        - name: hello-world-tainted-node-affinity
+          image: tutum/hello-world
+          resources:
+            limits:
+              cpu: "100m"
+              memory: 128Mi
+            requests:
+              cpu: "50m"
+              memory: 64Mi
+          ports:
+            - containerPort: 80
+

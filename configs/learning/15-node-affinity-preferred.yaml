@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world-node-affinity
+  labels:
+    component: hello-world-node-affinity
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      component: hello-world-node-affinity
+  template:
+    metadata:
+      labels:
+        component: hello-world-node-affinity
+    spec:
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              preference:
+                matchExpressions:
+                  - key: failure-domain.beta.kubernetes.io/zone
+                    operator: In
+                    values:
+                      - europe-west2-b
+      containers:
+        - name: hello-world-node-affinity
+          image: tutum/hello-world
+          resources:
+            limits:
+              cpu: "100m"
+              memory: 128Mi
+            requests:
+              cpu: "50m"
+              memory: 64Mi
+          ports:
+            - containerPort: 80

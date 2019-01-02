@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world-node-selector
+  labels:
+    component: hello-world-node-selector
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      component: hello-world-node-selector
+  template:
+    metadata:
+      labels:
+        component: hello-world-node-selector
+    spec:
+      containers:
+        - name: hello-world-node-selector
+          image: tutum/hello-world
+          resources:
+            limits:
+              cpu: "100m"
+              memory: 128Mi
+            requests:
+              cpu: "50m"
+              memory: 64Mi
+          ports:
+            - containerPort: 80
+      nodeSelector:
+        nodetype: special
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hello-world-node-selector
+spec:
+  ports:
+    -  name: http
+       port: 80
+       protocol: TCP
+       targetPort: 80
+  selector:
+    component: hello-world-node-selector
+  type: ClusterIP
