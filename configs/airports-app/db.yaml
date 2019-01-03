@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: ${DB_NAME}-db-credentials
+  name: ${SERVICE_NAME}-db-credentials
   namespace: ${NAMESPACE}
 type: Opaque
 data:
@@ -13,7 +13,7 @@ data:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: ${DB_NAME}-db-data
+  name: ${SERVICE_NAME}-db-data
   namespace: ${NAMESPACE}
 spec:
   accessModes:
@@ -25,22 +25,22 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ${DB_NAME}-db
+  name: ${SERVICE_NAME}-db
   namespace: ${NAMESPACE}
   labels:
-    component: ${DB_NAME}-db
+    component: ${SERVICE_NAME}-db
 spec:
   replicas: 1
   selector:
     matchLabels:
-      component: ${DB_NAME}-db
+      component: ${SERVICE_NAME}-db
   template:
     metadata:
       labels:
-        component: ${DB_NAME}-db
+        component: ${SERVICE_NAME}-db
     spec:
       containers:
-        - name: ${DB_NAME}-db
+        - name: ${SERVICE_NAME}-db
           image: mongo:${SERVICE_MONGO_VER}
           resources:
             limits:
@@ -57,12 +57,12 @@ spec:
             - name: MONGO_INITDB_ROOT_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: ${DB_NAME}-db-credentials
+                  name: ${SERVICE_NAME}-db-credentials
                   key: username
             - name: MONGO_INITDB_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: ${DB_NAME}-db-credentials
+                  name: ${SERVICE_NAME}-db-credentials
                   key: password
           volumeMounts:
             - mountPath: /data/db
@@ -87,12 +87,12 @@ spec:
       volumes:
         - name: persistent-volume
           persistentVolumeClaim:
-            claimName: ${DB_NAME}-db-data
+            claimName: ${SERVICE_NAME}-db-data
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: ${DB_NAME}-db
+  name: ${SERVICE_NAME}-db
   namespace: ${NAMESPACE}
 spec:
   ports:
@@ -101,23 +101,23 @@ spec:
       protocol: TCP
       targetPort: 27017
   selector:
-    component: ${DB_NAME}-db
+    component: ${SERVICE_NAME}-db
   type: ClusterIP
 ---
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
-  name: access-${DB_NAME}-db
+  name: access-${SERVICE_NAME}-db
   namespace: ${NAMESPACE}
 spec:
   podSelector:
     matchLabels:
-      component: ${DB_NAME}-db
+      component: ${SERVICE_NAME}-db
   ingress:
     - from:
         - podSelector:
             matchLabels:
-              access-${DB_NAME}-db: "1"
+              access-${SERVICE_NAME}-db: "1"
           namespaceSelector:
             matchLabels:
               name: '${NAMESPACE}'

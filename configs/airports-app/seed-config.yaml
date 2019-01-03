@@ -18,7 +18,7 @@ data:
        --jsonArray
   wait-for-file.sh: |
     echo "Waiting for file:"
-    while ! [[ -f "/app/data/data.json" ]]; do
+    while ! [[ -f "/app/data/data.json" && -f "/app/data/copied" ]]; do
       echo -ne "#"
       sleep 1
     done

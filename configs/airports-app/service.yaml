@@ -1,52 +1,58 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: airports
+  name: ${SERVICE_NAME}
   namespace: ${NAMESPACE}
   labels:
-    component: airports
+    component: ${SERVICE_NAME}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      component: airports
+      component: ${SERVICE_NAME}
   template:
     metadata:
       labels:
-        component: airports
-        access-airports-db: "1"
+        component: ${SERVICE_NAME}
+        access-${SERVICE_NAME}-db: "1"
     spec:
       containers:
-        - name: airports
-          image: ${GCLOUD_HOSTNAME}/${GCLOUD_PROJECTNAME}/airports:${SERVICE_AIRPORTS_VER}
+        - name: ${SERVICE_NAME}
+          image: ${GCLOUD_HOSTNAME}/${GCLOUD_PROJECTNAME}/${SERVICE_NAME}:${SERVICE_VER}
           resources:
             limits:
-              cpu: "100m"
-              memory: 256Mi
+              cpu: "${SERVICE_CPU_LIMIT}"
+              memory: ${SERVICE_MEMORY_LIMIT}
             requests:
-              cpu: "50m"
-              memory: 64Mi
+              cpu: "${SERVICE_CPU_REQUEST}"
+              memory: ${SERVICE_MEMORY_REQUEST}
           ports:
             - containerPort: 8080
           env:
             - name: MONGO_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: airports-db-credentials
+                  name: ${SERVICE_NAME}-db-credentials
                   key: username
             - name: MONGO_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: airports-db-credentials
+                  name: ${SERVICE_NAME}-db-credentials
                   key: password
+            - name: MONGO_COLLECTION
+              valueFrom:
+                secretKeyRef:
+                  name: ${SERVICE_NAME}-db-credentials
+                  key: collection
+            - name: MONGO_DB
+              valueFrom:
+                secretKeyRef:
+                  name: ${SERVICE_NAME}-db-credentials
+                  key: database
             - name: MONGO_DOMAIN
-              value: 'airports-db.${NAMESPACE}.svc.cluster.local'
+              value: '${SERVICE_NAME}-db.${NAMESPACE}.svc.cluster.local'
             - name: MONGO_PORT
               value: '27017'
-            - name: MONGO_COLLECTION
-              value: 'airports'
-            - name: MONGO_DB
-              value: 'airports'
           livenessProbe:
             httpGet:
               path: /health
@@ -63,7 +69,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: airports
+  name: ${SERVICE_NAME}
   namespace: ${NAMESPACE}
 spec:
   ports:
@@ -72,23 +78,23 @@ spec:
        protocol: TCP
        targetPort: 8080
   selector:
-    component: airports
+    component: ${SERVICE_NAME}
   type: ClusterIP
 ---
 kind: NetworkPolicy
 apiVersion: networking.k8s.io/v1
 metadata:
-  name: access-airports
+  name: access-${SERVICE_NAME}
   namespace: ${NAMESPACE}
 spec:
   podSelector:
     matchLabels:
-      component: airports
+      component: ${SERVICE_NAME}
   ingress:
     - from:
         - podSelector:
             matchLabels:
-              access-airports: "1"
+              access-${SERVICE_NAME}: "1"
           namespaceSelector:
             matchLabels:
               name: '${NAMESPACE}'
@@ -96,13 +102,13 @@ spec:
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: autoscaler-airports
+  name: autoscaler-${SERVICE_NAME}
   namespace: ${NAMESPACE}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: airports
+    name: ${SERVICE_NAME}
   minReplicas: 1
   maxReplicas: 2
   metrics:

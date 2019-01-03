@@ -1,0 +1,119 @@
+[
+  {
+    "name": "airports-db",
+    "path": "airports-app/db.yaml",
+    "type": "deployment",
+    "env": [
+      "DB_USR=$AIRPORTS_DB_USR",
+      "DB_PW=$AIRPORTS_DB_PW",
+      "DB_NAME=airports",
+      "DB_COLLECTION=airports",
+      "SERVICE_NAME=airports"
+    ]
+  },
+  {
+    "name": "runways-db",
+    "path": "airports-app/db.yaml",
+    "type": "deployment",
+    "env": [
+      "DB_USR=$RUNWAYS_DB_USR",
+      "DB_PW=$RUNWAYS_DB_PW",
+      "DB_NAME=runways",
+      "DB_COLLECTION=runways",
+      "SERVICE_NAME=runways"
+    ]
+  },
+  {
+    "name": "countries-db",
+    "path": "airports-app/db.yaml",
+    "type": "deployment",
+    "env": [
+      "DB_USR=$COUNTRIES_DB_USR",
+      "DB_PW=$COUNTRIES_DB_PW",
+      "DB_NAME=countries",
+      "DB_COLLECTION=countries",
+      "SERVICE_NAME=countries"
+    ]
+  },
+  {
+    "name": "seed-config",
+    "path": "airports-app/seed-config.yaml",
+    "type": "config"
+  },
+  {
+    "name": "airports",
+    "path": "airports-app/service.yaml",
+    "type": "deployment",
+    "env": [
+      "SERVICE_NAME=airports",
+      "SERVICE_VER=$SERVICE_AIRPORTS_VER",
+      "SERVICE_CPU_LIMIT=$SERVICE_AIRPORTS_CPU_LIMIT",
+      "SERVICE_MEMORY_LIMIT=$SERVICE_AIRPORTS_MEMORY_LIMIT",
+      "SERVICE_CPU_REQUEST=$SERVICE_AIRPORTS_CPU_REQUEST",
+      "SERVICE_MEMORY_REQUEST=$SERVICE_AIRPORTS_MEMORY_REQUEST"
+    ]
+  },
+  {
+    "name": "runways",
+    "path": "airports-app/service.yaml",
+    "type": "deployment",
+    "env": [
+      "SERVICE_NAME=runways",
+      "SERVICE_VER=$SERVICE_RUNWAYS_VER",
+      "SERVICE_CPU_LIMIT=$SERVICE_RUNWAYS_CPU_LIMIT",
+      "SERVICE_MEMORY_LIMIT=$SERVICE_RUNWAYS_MEMORY_LIMIT",
+      "SERVICE_CPU_REQUEST=$SERVICE_RUNWAYS_CPU_REQUEST",
+      "SERVICE_MEMORY_REQUEST=$SERVICE_RUNWAYS_MEMORY_REQUEST"
+    ]
+  },
+  {
+    "name": "countries",
+    "path": "airports-app/service.yaml",
+    "type": "deployment",
+    "env": [
+      "SERVICE_NAME=countries",
+      "SERVICE_VER=$SERVICE_COUNTRIES_VER",
+      "SERVICE_CPU_LIMIT=$SERVICE_COUNTRIES_CPU_LIMIT",
+      "SERVICE_MEMORY_LIMIT=$SERVICE_COUNTRIES_MEMORY_LIMIT",
+      "SERVICE_CPU_REQUEST=$SERVICE_COUNTRIES_CPU_REQUEST",
+      "SERVICE_MEMORY_REQUEST=$SERVICE_COUNTRIES_MEMORY_REQUEST"
+    ]
+  },
+  {
+    "name": "countries-seed",
+    "path": "airports-app/seed.yaml",
+    "type": "pod",
+    "match": "Init:1/2",
+    "env": [
+      "SERVICE_NAME=countries"
+    ]
+  },
+  {
+    "name": "runways-seed",
+    "path": "airports-app/seed.yaml",
+    "type": "pod",
+    "match": "Init:1/2",
+    "env": [
+      "SERVICE_NAME=runways"
+    ]
+  },
+  {
+    "name": "airports-seed",
+    "path": "airports-app/seed.yaml",
+    "type": "pod",
+    "match": "Init:1/2",
+    "env": [
+      "SERVICE_NAME=airports"
+    ]
+  },
+  {
+    "name": "frontend",
+    "path": "airports-app/frontend-service.yaml",
+    "type": "deployment"
+  },
+  {
+    "name": "runways-country",
+    "path": "airports-app/runways-country-service.yaml",
+    "type": "deployment"
+  }
+]

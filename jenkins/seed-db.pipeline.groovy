@@ -35,6 +35,7 @@ pipeline {
         unstash 'data'
 
         sh "kubectl cp ./data/json/${env.SERVICE_NAME}.json ${env.NAMESPACE}/${env.SERVICE_NAME}-seed:/app/data/data.json -c waiting-for-data"
+        sh "kubectl exec -n '${env.NAMESPACE}' -c waiting-for-data ${env.SERVICE_NAME}-seed touch /app/data/copied"
       }
     }
   }

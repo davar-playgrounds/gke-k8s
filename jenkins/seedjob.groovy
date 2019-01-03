@@ -1,3 +1,5 @@
+import groovy.json.JsonSlurper
+
 folder("Deployments") {
   displayName("Kubernetes Deployments")
 }
@@ -19,6 +21,7 @@ folder("Build/docker") {
 }
 
 final List userspaces = readFileFromWorkspace('configs/users').split(',')
+final String deployments = readFileFromWorkspace('configs/deployments.json')
 
 Closure scmConfiguration(String branch = "*/master", String gitUrl = 'https://github.com/mhaddon/gke-k8s') {
   return {
@@ -84,21 +87,7 @@ Closure scmConfiguration(String branch = "*/master", String gitUrl = 'https://gi
   }
 }
 
-[
-  [ name: "airports-db", path: "airports-app/db.yaml", type: "deployment", env: "DB_USR=\$AIRPORTS_DB_USR;DB_PW=\$AIRPORTS_DB_PW;DB_NAME=airports;DB_COLLECTION=airports"],
-  [ name: "seed-config", path: "airports-app/seed-config.yaml", type: "config" ],
-//  [ name: "airports-db", path: "airports-app/airports-db.yaml", type: "deployment" ],
-  [ name: "airports", path: "airports-app/airports-service.yaml", type: "deployment" ],
-  [ name: "airports-seed", path: "airports-app/airports-seed.yaml", type: "pod", match: "Init:1/2" ],
-  [ name: "countries-db", path: "airports-app/countries-db.yaml", type: "deployment" ],
-  [ name: "countries", path: "airports-app/countries-service.yaml", type: "deployment" ],
-  [ name: "countries-seed", path: "airports-app/countries-seed.yaml", type: "pod", match: "Init:1/2" ],
-  [ name: "runways-db", path: "airports-app/runways-db.yaml", type: "deployment" ],
-  [ name: "runways", path: "airports-app/runways-service.yaml", type: "deployment" ],
-  [ name: "runways-seed", path: "airports-app/runways-seed.yaml", type: "pod", match: "Init:1/2" ],
-  [ name: "runways-country", path: "airports-app/runways-country-service.yaml", type: "deployment" ],
-  [ name: "frontend", path: "airports-app/frontend-service.yaml", type: "deployment" ]
-].each { environment ->
+(new JsonSlurper().parse(deployments.getBytes())).each { environment ->
   pipelineJob("Deployments/${environment.name}") {
     displayName("${environment.name}")
 
@@ -118,7 +107,7 @@ Closure scmConfiguration(String branch = "*/master", String gitUrl = 'https://gi
       env("NAME", "${environment.name}")
       env("TYPE", "${environment.type}")
       env("MATCH", "${environment.match ?: "Running"}")
-      env("ENV", "${environment.env ?: ""}")
+      env("ENV", "${(environment.env ?: []).join(";")}")
     }
 
     definition {
