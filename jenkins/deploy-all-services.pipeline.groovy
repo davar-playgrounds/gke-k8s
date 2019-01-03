@@ -1,6 +1,9 @@
 node {
   [
     [
+      name: "configs",
+      group: [ "Deployments/seed-config" ]
+    ], [
       name: "databases",
       group: [ "Deployments/airports-db", "Deployments/countries-db", "Deployments/runways-db" ]
     ], [

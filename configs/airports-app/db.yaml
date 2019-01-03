@@ -1,0 +1,123 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ${DB_NAME}-db-credentials
+  namespace: ${NAMESPACE}
+type: Opaque
+data:
+  username: '${DB_USR_B64}'
+  password: '${DB_PW_B64}'
+  database: '${DB_NAME_B64}'
+  collection: '${DB_COLLECTION_B64}'
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ${DB_NAME}-db-data
+  namespace: ${NAMESPACE}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${DB_NAME}-db
+  namespace: ${NAMESPACE}
+  labels:
+    component: ${DB_NAME}-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: ${DB_NAME}-db
+  template:
+    metadata:
+      labels:
+        component: ${DB_NAME}-db
+    spec:
+      containers:
+        - name: ${DB_NAME}-db
+          image: mongo:${SERVICE_MONGO_VER}
+          resources:
+            limits:
+              cpu: "150m"
+              memory: 512Mi
+            requests:
+              cpu: "50m"
+              memory: 128Mi
+          ports:
+            - containerPort: 27017
+              name: transport
+              protocol: TCP
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: ${DB_NAME}-db-credentials
+                  key: username
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ${DB_NAME}-db-credentials
+                  key: password
+          volumeMounts:
+            - mountPath: /data/db
+              name: persistent-volume
+              subPath: mongo/data
+          livenessProbe:
+            exec:
+              command:
+                - /bin/bash
+                - -c
+                - /bin/echo "$(test="$(/usr/bin/mongo --authenticationDatabase admin --username "$MONGO_INITDB_ROOT_USERNAME" --password "$MONGO_INITDB_ROOT_PASSWORD" localhost:27017/test --quiet <<< 'db.runCommand("ping").ok')"; ((test ^= 1)); /bin/echo "${test}")"
+            initialDelaySeconds: 15
+            periodSeconds: 15
+          readinessProbe:
+            exec:
+              command:
+                - /bin/bash
+                - -c
+                - /bin/echo "$(test="$(/usr/bin/mongo --authenticationDatabase admin --username "$MONGO_INITDB_ROOT_USERNAME" --password "$MONGO_INITDB_ROOT_PASSWORD" localhost:27017/test --quiet <<< 'db.runCommand("ping").ok')"; ((test ^= 1)); /bin/echo "${test}")"
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: persistent-volume
+          persistentVolumeClaim:
+            claimName: ${DB_NAME}-db-data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${DB_NAME}-db
+  namespace: ${NAMESPACE}
+spec:
+  ports:
+    - name: transport
+      port: 27017
+      protocol: TCP
+      targetPort: 27017
+  selector:
+    component: ${DB_NAME}-db
+  type: ClusterIP
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: access-${DB_NAME}-db
+  namespace: ${NAMESPACE}
+spec:
+  podSelector:
+    matchLabels:
+      component: ${DB_NAME}-db
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              access-${DB_NAME}-db: "1"
+          namespaceSelector:
+            matchLabels:
+              name: '${NAMESPACE}'

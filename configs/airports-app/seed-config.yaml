@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: seed-config
+  namespace: ${NAMESPACE}
+data:
+  import-db.sh: |
+    mongoimport \
+       --authenticationDatabase "admin" \
+       --username "${MONGO_USERNAME:-admin}" \
+       --password "${MONGO_PASSWORD:-password}" \
+       --host "${MONGO_DOMAIN:-127.0.0.1}" \
+       --port "${MONGO_PORT:-27017}" \
+       --db "${MONGO_DB:-default}" \
+       --collection "${MONGO_COLLECTION:-app}" \
+       --type "json" \
+       --file "/app/data/data.json" \
+       --jsonArray
+  wait-for-file.sh: |
+    echo "Waiting for file:"
+    while ! [[ -f "/app/data/data.json" ]]; do
+      echo -ne "#"
+      sleep 1
+    done
+    echo " - File loaded."
+  wait-for-db.sh: |
+    queryMongoVersion() {
+      mongo \
+         --authenticationDatabase "admin" \
+         --username "${MONGO_USERNAME:-admin}" \
+         --password "${MONGO_PASSWORD:-password}" \
+         --host "${MONGO_DOMAIN:-127.0.0.1}" \
+         --port "${MONGO_PORT:-27017}" \
+         --eval "db.version()"
+    }
+
+    while ! queryMongoVersion > /dev/null 2>&1; do sleep 1; done

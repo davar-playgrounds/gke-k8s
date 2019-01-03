@@ -34,7 +34,7 @@ pipeline {
       steps {
         unstash 'data'
 
-        sh "kubectl cp ./data/json/${env.SERVICE_NAME}.json ${env.NAMESPACE}/${env.SERVICE_NAME}-seed:/app/data.json"
+        sh "kubectl cp ./data/json/${env.SERVICE_NAME}.json ${env.NAMESPACE}/${env.SERVICE_NAME}-seed:/app/data/data.json -c waiting-for-data"
       }
     }
   }
